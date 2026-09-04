@@ -1,5 +1,6 @@
 const AppState = {
   grid: createGrid(20, 20),
+  palette: [],
   cellSize: 24,
   zoom: 1,
   activeTool: 'brush',
@@ -126,6 +127,54 @@ document.getElementById('zoom-out').addEventListener('click', () => {
   renderGrid();
 });
 
+const colorListEl = document.getElementById('color-list');
+
+function renderPalette() {
+  colorListEl.innerHTML = '';
+  AppState.palette.forEach((color) => {
+    const row = document.createElement('div');
+    row.className = 'swatch-row' + (color.id === AppState.activeColorId ? ' active' : '');
+
+    const swatch = document.createElement('div');
+    swatch.className = 'swatch';
+    swatch.style.backgroundColor = color.hex;
+    swatch.addEventListener('click', () => {
+      AppState.activeColorId = color.id;
+      renderPalette();
+    });
+
+    const nameInput = document.createElement('input');
+    nameInput.className = 'swatch-name';
+    nameInput.value = color.name;
+    nameInput.addEventListener('change', () => {
+      AppState.palette = renameColor(AppState.palette, color.id, nameInput.value);
+      renderPalette();
+    });
+
+    const removeBtn = document.createElement('span');
+    removeBtn.className = 'swatch-remove';
+    removeBtn.textContent = '✕';
+    removeBtn.addEventListener('click', () => {
+      AppState.palette = removeColor(AppState.palette, color.id);
+      if (AppState.activeColorId === color.id) AppState.activeColorId = null;
+      renderPalette();
+    });
+
+    row.appendChild(swatch);
+    row.appendChild(nameInput);
+    row.appendChild(removeBtn);
+    colorListEl.appendChild(row);
+  });
+}
+
+document.getElementById('add-color-btn').addEventListener('click', () => {
+  const hex = document.getElementById('new-color-picker').value;
+  AppState.palette = addColor(AppState.palette, hex, '');
+  AppState.activeColorId = AppState.palette[AppState.palette.length - 1].id;
+  renderPalette();
+});
+
 window.addEventListener('DOMContentLoaded', () => {
   renderGrid();
+  renderPalette();
 });

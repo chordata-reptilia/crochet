@@ -10,3 +10,9 @@ body { margin: 0; font-family: sans-serif; }
 .tool-btn.active { font-weight: bold; outline: 2px solid #333; }
 .toolbar-sep { display: inline-block; width: 16px; }
 #workspace { cursor: crosshair; }
+
+.swatch-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; padding: 4px; border-radius: 4px; }
+.swatch-row.active { background: #eee; }
+.swatch { width: 20px; height: 20px; border: 1px solid #999; flex-shrink: 0; cursor: pointer; }
+.swatch-name { flex: 1; border: none; background: transparent; }
+.swatch-remove { cursor: pointer; }

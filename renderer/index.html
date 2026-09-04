@@ -21,7 +21,14 @@
     <main id="workspace">
       <canvas id="grid-canvas"></canvas>
     </main>
-    <aside id="side-panel"></aside>
+    <aside id="side-panel">
+      <section id="palette-panel">
+        <h3>Couleurs</h3>
+        <div id="color-list"></div>
+        <input type="color" id="new-color-picker" value="#ff0000" />
+        <button id="add-color-btn">Ajouter</button>
+      </section>
+    </aside>
   </div>
 
   <script src="../src/grid.js"></script>
