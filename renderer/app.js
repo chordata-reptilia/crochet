@@ -93,16 +93,17 @@ function applyToolAt(x, y) {
 
   if (nextGrid !== grid) {
     AppState.grid = nextGrid;
-    pushHistory(nextGrid);
   }
   renderGrid();
   renderInstructions();
 }
 
 let isPointerDown = false;
+let strokeStartGrid = null;
 
 canvas.addEventListener('pointerdown', (evt) => {
   isPointerDown = true;
+  strokeStartGrid = AppState.grid;
   const { x, y } = canvasEventToCell(evt);
   applyToolAt(x, y);
 });
@@ -115,7 +116,13 @@ canvas.addEventListener('pointermove', (evt) => {
 });
 
 window.addEventListener('pointerup', () => {
+  // Record undo history once per whole stroke (pointerdown -> pointerup),
+  // not once per cell painted along the way.
+  if (isPointerDown && strokeStartGrid !== null && AppState.grid !== strokeStartGrid) {
+    pushHistory(AppState.grid);
+  }
   isPointerDown = false;
+  strokeStartGrid = null;
 });
 
 document.querySelectorAll('.tool-btn').forEach((btn) => {
