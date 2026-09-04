@@ -4,7 +4,7 @@ body { margin: 0; font-family: sans-serif; }
 #toolbar { padding: 8px; border-bottom: 1px solid #ccc; }
 #main-row { display: flex; flex-direction: row; flex: 1; overflow: hidden; }
 #workspace { flex: 1; display: flex; overflow: auto; }
-#grid-canvas { image-rendering: pixelated; }
+#grid-canvas { image-rendering: pixelated; display: block; align-self: flex-start; }
 #side-panel { width: 280px; border-left: 1px solid #ccc; overflow-y: auto; padding: 8px; }
 
 .tool-btn { margin-right: 4px; }
@@ -17,6 +17,8 @@ body { margin: 0; font-family: sans-serif; }
 .swatch { width: 20px; height: 20px; border: 1px solid #999; flex-shrink: 0; cursor: pointer; }
 .swatch-name { flex: 1; border: none; background: transparent; }
 .swatch-remove { cursor: pointer; }
+
+#new-color-hex { width: 80px; margin-left: 4px; }
 
 #instructions-list { font-size: 13px; padding-left: 20px; }
 #instructions-list li { margin-bottom: 2px; }

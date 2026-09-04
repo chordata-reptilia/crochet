@@ -62,8 +62,13 @@ function renderGrid() {
 function canvasEventToCell(evt) {
   const rect = canvas.getBoundingClientRect();
   const size = AppState.cellSize * AppState.zoom;
-  const x = Math.floor((evt.clientX - rect.left) / size);
-  const y = Math.floor((evt.clientY - rect.top) / size);
+  // Scale by the ratio of the canvas's internal (backing-store) resolution to
+  // its displayed CSS size, so clicks stay accurate even if CSS ever stretches
+  // the canvas away from its intrinsic width/height (e.g. flexbox stretch).
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = Math.floor(((evt.clientX - rect.left) * scaleX) / size);
+  const y = Math.floor(((evt.clientY - rect.top) * scaleY) / size);
   return { x, y };
 }
 
@@ -176,10 +181,24 @@ function renderPalette() {
   });
 }
 
+const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
+
 document.getElementById('add-color-btn').addEventListener('click', () => {
-  const hex = document.getElementById('new-color-picker').value;
+  const hexInput = document.getElementById('new-color-hex');
+  const typedHex = hexInput.value.trim();
+  let hex = document.getElementById('new-color-picker').value;
+
+  if (typedHex !== '') {
+    if (!HEX_COLOR_PATTERN.test(typedHex)) {
+      alert('Code hexadécimal invalide. Format attendu : #RRGGBB (ex. #87CEEB).');
+      return;
+    }
+    hex = typedHex;
+  }
+
   AppState.palette = addColor(AppState.palette, hex, '');
   AppState.activeColorId = AppState.palette[AppState.palette.length - 1].id;
+  hexInput.value = '';
   renderPalette();
   renderInstructions();
 });
