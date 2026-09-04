@@ -52,3 +52,41 @@ test('generateInstructions throws on an unknown mode', () => {
   project.mode = 'weird';
   expect(() => generateInstructions(project)).toThrow(/mode/i);
 });
+
+const { generateC2CInstructions } = require('../src/instructions');
+
+test('generateC2CInstructions walks diagonals from the corner outward', () => {
+  const palette = [{ id: 'c1', name: 'A', hex: '#000000' }];
+  const cells = [
+    ['c1', 'c1'],
+    ['c1', 'c1'],
+  ];
+  const project = { name: 'T', mode: 'c2c', width: 2, height: 2, palette, cells };
+  const lines = generateC2CInstructions(project);
+  // Diagonal 0: (0,0). Diagonal 1: (1,0),(0,1). Diagonal 2: (1,1).
+  expect(lines).toEqual([
+    'Bloc 1 : 1 maille A',
+    'Bloc 2 : 2 mailles A',
+    'Bloc 3 : 1 maille A',
+  ]);
+});
+
+test('generateC2CInstructions groups colors within a diagonal', () => {
+  const palette = [
+    { id: 'c1', name: 'A', hex: '#000000' },
+    { id: 'c2', name: 'B', hex: '#FFFFFF' },
+  ];
+  const cells = [
+    ['c1', 'c2'],
+    ['c2', 'c1'],
+  ];
+  const project = { name: 'T', mode: 'c2c', width: 2, height: 2, palette, cells };
+  const lines = generateC2CInstructions(project);
+  expect(lines[1]).toBe('Bloc 2 : 2 mailles B');
+});
+
+test('generateInstructions dispatches to c2c mode', () => {
+  const palette = [{ id: 'c1', name: 'A', hex: '#000000' }];
+  const project = { name: 'T', mode: 'c2c', width: 1, height: 1, palette, cells: [['c1']] };
+  expect(generateInstructions(project)).toEqual(['Bloc 1 : 1 maille A']);
+});
