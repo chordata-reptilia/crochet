@@ -2,6 +2,7 @@ const AppState = {
   grid: createGrid(20, 20),
   palette: [],
   mode: 'classic',
+  name: 'Nouveau motif',
   cellSize: 24,
   zoom: 1,
   activeTool: 'brush',
@@ -72,8 +73,10 @@ function applyToolAt(x, y) {
 
   let nextGrid = grid;
   if (activeTool === 'brush') {
+    if (getCell(grid, x, y) === activeColorId) return;
     nextGrid = setCell(grid, x, y, activeColorId);
   } else if (activeTool === 'eraser') {
+    if (getCell(grid, x, y) === null) return;
     nextGrid = setCell(grid, x, y, null);
   } else if (activeTool === 'bucket') {
     nextGrid = floodFill(grid, x, y, activeColorId);
@@ -216,6 +219,7 @@ function loadProjectIntoState(project) {
   AppState.grid = { width: project.width, height: project.height, cells: project.cells };
   AppState.palette = project.palette;
   AppState.mode = project.mode;
+  AppState.name = project.name;
   AppState.activeColorId = null;
   History.stack = [AppState.grid];
   History.index = 0;
@@ -226,13 +230,26 @@ function loadProjectIntoState(project) {
 }
 
 document.getElementById('new-project-btn').addEventListener('click', () => {
-  const project = createProject({ name: 'Nouveau motif', mode: 'classic', width: 20, height: 20 });
+  const widthInput = window.prompt('Largeur de la grille (mailles) :', '20');
+  if (widthInput === null) return; // user canceled
+  const heightInput = window.prompt('Hauteur de la grille (mailles) :', '20');
+  if (heightInput === null) return;
+  const width = parseInt(widthInput, 10);
+  const height = parseInt(heightInput, 10);
+  if (!Number.isInteger(width) || width <= 0 || !Number.isInteger(height) || height <= 0) {
+    alert('Largeur et hauteur doivent être des nombres entiers positifs.');
+    return;
+  }
+  const modeInput = window.confirm('Cliquez OK pour le mode Corner-to-Corner (C2C), ou Annuler pour le mode grille classique.');
+  const mode = modeInput ? 'c2c' : 'classic';
+  const nameInput = window.prompt('Nom du motif :', 'Nouveau motif') || 'Nouveau motif';
+  const project = createProject({ name: nameInput, mode, width, height });
   loadProjectIntoState(project);
 });
 
 document.getElementById('save-project-btn').addEventListener('click', async () => {
   const project = {
-    name: 'Motif',
+    name: AppState.name,
     mode: AppState.mode,
     width: AppState.grid.width,
     height: AppState.grid.height,

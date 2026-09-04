@@ -23,28 +23,30 @@
       <button id="zoom-in">Zoom +</button>
       <button id="zoom-out">Zoom -</button>
     </header>
-    <main id="workspace">
-      <canvas id="grid-canvas"></canvas>
-    </main>
-    <aside id="side-panel">
-      <section id="palette-panel">
-        <h3>Couleurs</h3>
-        <div id="color-list"></div>
-        <input type="color" id="new-color-picker" value="#ff0000" />
-        <button id="add-color-btn">Ajouter</button>
-      </section>
-      <section id="mode-panel">
-        <h3>Mode</h3>
-        <select id="mode-select">
-          <option value="classic">Grille classique</option>
-          <option value="c2c">Corner-to-Corner (C2C)</option>
-        </select>
-      </section>
-      <section id="instructions-panel">
-        <h3>Instructions</h3>
-        <ol id="instructions-list"></ol>
-      </section>
-    </aside>
+    <div id="main-row">
+      <main id="workspace">
+        <canvas id="grid-canvas"></canvas>
+      </main>
+      <aside id="side-panel">
+        <section id="palette-panel">
+          <h3>Couleurs</h3>
+          <div id="color-list"></div>
+          <input type="color" id="new-color-picker" value="#ff0000" />
+          <button id="add-color-btn">Ajouter</button>
+        </section>
+        <section id="mode-panel">
+          <h3>Mode</h3>
+          <select id="mode-select">
+            <option value="classic">Grille classique</option>
+            <option value="c2c">Corner-to-Corner (C2C)</option>
+          </select>
+        </section>
+        <section id="instructions-panel">
+          <h3>Instructions</h3>
+          <ol id="instructions-list"></ol>
+        </section>
+      </aside>
+    </div>
   </div>
 
   <script src="../src/grid.js"></script>

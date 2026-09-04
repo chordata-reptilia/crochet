@@ -1,14 +1,13 @@
-const { createGrid } = require('./grid');
-const { createPalette } = require('./palette');
-
 function createProject({ name, mode, width, height }) {
-  const grid = createGrid(width, height);
+  const _createGrid = typeof require === 'function' ? require('./grid').createGrid : createGrid;
+  const _createPalette = typeof require === 'function' ? require('./palette').createPalette : createPalette;
+  const grid = _createGrid(width, height);
   return {
     name,
     mode,
     width,
     height,
-    palette: createPalette(),
+    palette: _createPalette(),
     cells: grid.cells,
   };
 }
