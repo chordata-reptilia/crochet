@@ -7,7 +7,15 @@
 </head>
 <body>
   <div id="app">
-    <header id="toolbar"></header>
+    <header id="toolbar">
+      <button id="tool-brush" class="tool-btn active" data-tool="brush">Pinceau</button>
+      <button id="tool-bucket" class="tool-btn" data-tool="bucket">Seau</button>
+      <button id="tool-eraser" class="tool-btn" data-tool="eraser">Gomme</button>
+      <button id="tool-eyedropper" class="tool-btn" data-tool="eyedropper">Pipette</button>
+      <span class="toolbar-sep"></span>
+      <button id="zoom-in">Zoom +</button>
+      <button id="zoom-out">Zoom -</button>
+    </header>
     <main id="workspace">
       <canvas id="grid-canvas"></canvas>
     </main>
