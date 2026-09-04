@@ -74,7 +74,7 @@ Le PDF est généré avec `pdfkit`. Pour chaque page :
 ```js
 // renderer -> main, canal 'export:pdf'
 {
-  gridImageData: { width, height, cells, palette, mode }, // pour reconstruire l'image page par page côté main
+  chart: { width, height, cells, palette, mode }, // état brut de la grille, pour reconstruire le rendu page par page côté main
   instructions: string[],
   options: {
     orientation: 'portrait' | 'landscape',
