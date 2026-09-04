@@ -140,6 +140,10 @@ document.getElementById('zoom-out').addEventListener('click', () => {
 });
 
 canvas.addEventListener('wheel', (evt) => {
+  // Ctrl+wheel zooms; plain wheel (vertical) and Shift+wheel (horizontal)
+  // are left alone so the browser's native scrolling of #workspace still
+  // works for panning the grid.
+  if (!evt.ctrlKey) return;
   evt.preventDefault();
   if (evt.deltaY < 0) {
     AppState.zoom = Math.min(AppState.zoom + 0.25, 3);

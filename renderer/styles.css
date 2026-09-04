@@ -24,11 +24,11 @@ body { margin: 0; font-family: sans-serif; }
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
-  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
 }
+#new-project-modal:not([hidden]) { display: flex; }
 #new-project-modal-box {
   background: #fff;
   padding: 20px;
