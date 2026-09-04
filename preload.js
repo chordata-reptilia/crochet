@@ -1,5 +1,6 @@
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-  // Extended in later tasks (project save/open, PNG/PDF export).
+  saveProjectAs: (jsonString) => ipcRenderer.invoke('project:saveAs', jsonString),
+  openProject: () => ipcRenderer.invoke('project:open'),
 });

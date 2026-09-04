@@ -211,3 +211,51 @@ window.addEventListener('DOMContentLoaded', () => {
   renderPalette();
   renderInstructions();
 });
+
+function loadProjectIntoState(project) {
+  AppState.grid = { width: project.width, height: project.height, cells: project.cells };
+  AppState.palette = project.palette;
+  AppState.mode = project.mode;
+  AppState.activeColorId = null;
+  History.stack = [AppState.grid];
+  History.index = 0;
+  document.getElementById('mode-select').value = project.mode;
+  renderGrid();
+  renderPalette();
+  renderInstructions();
+}
+
+document.getElementById('new-project-btn').addEventListener('click', () => {
+  const project = createProject({ name: 'Nouveau motif', mode: 'classic', width: 20, height: 20 });
+  loadProjectIntoState(project);
+});
+
+document.getElementById('save-project-btn').addEventListener('click', async () => {
+  const project = {
+    name: 'Motif',
+    mode: AppState.mode,
+    width: AppState.grid.width,
+    height: AppState.grid.height,
+    palette: AppState.palette,
+    cells: AppState.grid.cells,
+  };
+  const json = serializeProject(project);
+  const result = await window.api.saveProjectAs(json);
+  if (!result.success && !result.canceled) {
+    alert(`Erreur lors de l'enregistrement : ${result.error}`);
+  }
+});
+
+document.getElementById('open-project-btn').addEventListener('click', async () => {
+  const result = await window.api.openProject();
+  if (!result.success) {
+    if (!result.canceled) alert(`Erreur lors de l'ouverture : ${result.error}`);
+    return;
+  }
+  try {
+    const project = deserializeProject(result.contents);
+    loadProjectIntoState(project);
+  } catch (err) {
+    alert(`Fichier projet invalide : ${err.message}`);
+  }
+});
