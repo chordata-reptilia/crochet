@@ -1,0 +1,27 @@
+{
+  "name": "crochet-pattern-designer",
+  "version": "1.0.0",
+  "description": "Local Windows desktop app for designing crochet grid patterns",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "jest",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.crochetpatterndesigner.app",
+    "productName": "Crochet Pattern Designer",
+    "files": ["main.js", "preload.js", "renderer/**/*", "src/**/*", "package.json"],
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.2.0",
+    "electron-builder": "^26.15.3",
+    "jest": "^30.5.1"
+  },
+  "dependencies": {
+    "pdfkit": "^0.20.2"
+  }
+}
