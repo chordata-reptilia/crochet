@@ -11,6 +11,7 @@
   "build": {
     "appId": "com.crochetpatterndesigner.app",
     "productName": "Crochet Pattern Designer",
+    "asar": true,
     "files": ["main.js", "preload.js", "renderer/**/*", "src/**/*", "package.json"],
     "win": {
       "target": "nsis"
