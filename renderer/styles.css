@@ -16,3 +16,6 @@ body { margin: 0; font-family: sans-serif; }
 .swatch { width: 20px; height: 20px; border: 1px solid #999; flex-shrink: 0; cursor: pointer; }
 .swatch-name { flex: 1; border: none; background: transparent; }
 .swatch-remove { cursor: pointer; }
+
+#instructions-list { font-size: 13px; padding-left: 20px; }
+#instructions-list li { margin-bottom: 2px; }

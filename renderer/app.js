@@ -1,6 +1,7 @@
 const AppState = {
   grid: createGrid(20, 20),
   palette: [],
+  mode: 'classic',
   cellSize: 24,
   zoom: 1,
   activeTool: 'brush',
@@ -23,6 +24,7 @@ function undo() {
   History.index -= 1;
   AppState.grid = History.stack[History.index];
   renderGrid();
+  renderInstructions();
 }
 
 function redo() {
@@ -30,6 +32,7 @@ function redo() {
   History.index += 1;
   AppState.grid = History.stack[History.index];
   renderGrid();
+  renderInstructions();
 }
 
 const canvas = document.getElementById('grid-canvas');
@@ -85,6 +88,7 @@ function applyToolAt(x, y) {
     pushHistory(nextGrid);
   }
   renderGrid();
+  renderInstructions();
 }
 
 let isPointerDown = false;
@@ -149,6 +153,7 @@ function renderPalette() {
     nameInput.addEventListener('change', () => {
       AppState.palette = renameColor(AppState.palette, color.id, nameInput.value);
       renderPalette();
+      renderInstructions();
     });
 
     const removeBtn = document.createElement('span');
@@ -158,6 +163,7 @@ function renderPalette() {
       AppState.palette = removeColor(AppState.palette, color.id);
       if (AppState.activeColorId === color.id) AppState.activeColorId = null;
       renderPalette();
+      renderInstructions();
     });
 
     row.appendChild(swatch);
@@ -172,9 +178,36 @@ document.getElementById('add-color-btn').addEventListener('click', () => {
   AppState.palette = addColor(AppState.palette, hex, '');
   AppState.activeColorId = AppState.palette[AppState.palette.length - 1].id;
   renderPalette();
+  renderInstructions();
+});
+
+const instructionsListEl = document.getElementById('instructions-list');
+
+function renderInstructions() {
+  const project = {
+    name: '',
+    mode: AppState.mode,
+    width: AppState.grid.width,
+    height: AppState.grid.height,
+    palette: AppState.palette,
+    cells: AppState.grid.cells,
+  };
+  const lines = generateInstructions(project);
+  instructionsListEl.innerHTML = '';
+  lines.forEach((line) => {
+    const li = document.createElement('li');
+    li.textContent = line;
+    instructionsListEl.appendChild(li);
+  });
+}
+
+document.getElementById('mode-select').addEventListener('change', (evt) => {
+  AppState.mode = evt.target.value;
+  renderInstructions();
 });
 
 window.addEventListener('DOMContentLoaded', () => {
   renderGrid();
   renderPalette();
+  renderInstructions();
 });
