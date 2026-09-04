@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs/promises');
+const { buildPdf } = require('./src/export/pdf');
 
 let mainWindow;
 
@@ -45,6 +46,35 @@ ipcMain.handle('project:open', async () => {
   try {
     const contents = await fs.readFile(result.filePaths[0], 'utf-8');
     return { success: true, path: result.filePaths[0], contents };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('export:png', async (_event, dataUrl) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    filters: [{ name: 'Image PNG', extensions: ['png'] }],
+    defaultPath: 'motif.png',
+  });
+  if (result.canceled || !result.filePath) return { success: false, canceled: true };
+  try {
+    const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+    await fs.writeFile(result.filePath, Buffer.from(base64, 'base64'));
+    return { success: true, path: result.filePath };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('export:pdf', async (_event, { dataUrl, instructions }) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    filters: [{ name: 'PDF', extensions: ['pdf'] }],
+    defaultPath: 'motif.pdf',
+  });
+  if (result.canceled || !result.filePath) return { success: false, canceled: true };
+  try {
+    await buildPdf({ imageDataUrl: dataUrl, instructions, outputPath: result.filePath });
+    return { success: true, path: result.filePath };
   } catch (err) {
     return { success: false, error: err.message };
   }

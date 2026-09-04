@@ -259,3 +259,28 @@ document.getElementById('open-project-btn').addEventListener('click', async () =
     alert(`Fichier projet invalide : ${err.message}`);
   }
 });
+
+document.getElementById('export-png-btn').addEventListener('click', async () => {
+  const dataUrl = canvas.toDataURL('image/png');
+  const result = await window.api.exportPng(dataUrl);
+  if (!result.success && !result.canceled) {
+    alert(`Erreur lors de l'export PNG : ${result.error}`);
+  }
+});
+
+document.getElementById('export-pdf-btn').addEventListener('click', async () => {
+  const dataUrl = canvas.toDataURL('image/png');
+  const project = {
+    name: '',
+    mode: AppState.mode,
+    width: AppState.grid.width,
+    height: AppState.grid.height,
+    palette: AppState.palette,
+    cells: AppState.grid.cells,
+  };
+  const instructions = generateInstructions(project);
+  const result = await window.api.exportPdf({ dataUrl, instructions });
+  if (!result.success && !result.canceled) {
+    alert(`Erreur lors de l'export PDF : ${result.error}`);
+  }
+});
