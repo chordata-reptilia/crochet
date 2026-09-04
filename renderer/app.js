@@ -139,6 +139,28 @@ document.getElementById('zoom-out').addEventListener('click', () => {
   renderGrid();
 });
 
+canvas.addEventListener('wheel', (evt) => {
+  evt.preventDefault();
+  if (evt.deltaY < 0) {
+    AppState.zoom = Math.min(AppState.zoom + 0.25, 3);
+  } else if (evt.deltaY > 0) {
+    AppState.zoom = Math.max(AppState.zoom - 0.25, 0.25);
+  }
+  renderGrid();
+}, { passive: false });
+
+window.addEventListener('keydown', (evt) => {
+  if (!newProjectModal.hidden) return;
+  const key = evt.key.toLowerCase();
+  if ((evt.ctrlKey || evt.metaKey) && key === 'z' && !evt.shiftKey) {
+    evt.preventDefault();
+    undo();
+  } else if ((evt.ctrlKey || evt.metaKey) && (key === 'y' || (key === 'z' && evt.shiftKey))) {
+    evt.preventDefault();
+    redo();
+  }
+});
+
 const colorListEl = document.getElementById('color-list');
 
 function renderPalette() {
@@ -248,22 +270,32 @@ function loadProjectIntoState(project) {
   renderInstructions();
 }
 
+const newProjectModal = document.getElementById('new-project-modal');
+
 document.getElementById('new-project-btn').addEventListener('click', () => {
-  const widthInput = window.prompt('Largeur de la grille (mailles) :', '20');
-  if (widthInput === null) return; // user canceled
-  const heightInput = window.prompt('Hauteur de la grille (mailles) :', '20');
-  if (heightInput === null) return;
-  const width = parseInt(widthInput, 10);
-  const height = parseInt(heightInput, 10);
+  document.getElementById('new-project-name').value = 'Nouveau motif';
+  document.getElementById('new-project-width').value = '20';
+  document.getElementById('new-project-height').value = '20';
+  document.getElementById('new-project-mode').value = 'classic';
+  newProjectModal.hidden = false;
+});
+
+document.getElementById('new-project-cancel').addEventListener('click', () => {
+  newProjectModal.hidden = true;
+});
+
+document.getElementById('new-project-confirm').addEventListener('click', () => {
+  const name = document.getElementById('new-project-name').value.trim() || 'Nouveau motif';
+  const width = parseInt(document.getElementById('new-project-width').value, 10);
+  const height = parseInt(document.getElementById('new-project-height').value, 10);
+  const mode = document.getElementById('new-project-mode').value;
   if (!Number.isInteger(width) || width <= 0 || !Number.isInteger(height) || height <= 0) {
     alert('Largeur et hauteur doivent être des nombres entiers positifs.');
     return;
   }
-  const modeInput = window.confirm('Cliquez OK pour le mode Corner-to-Corner (C2C), ou Annuler pour le mode grille classique.');
-  const mode = modeInput ? 'c2c' : 'classic';
-  const nameInput = window.prompt('Nom du motif :', 'Nouveau motif') || 'Nouveau motif';
-  const project = createProject({ name: nameInput, mode, width, height });
+  const project = createProject({ name, mode, width, height });
   loadProjectIntoState(project);
+  newProjectModal.hidden = true;
 });
 
 document.getElementById('save-project-btn').addEventListener('click', async () => {

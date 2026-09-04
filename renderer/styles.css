@@ -20,5 +20,23 @@ body { margin: 0; font-family: sans-serif; }
 
 #new-color-hex { width: 80px; margin-left: 4px; }
 
+#new-project-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+#new-project-modal-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  min-width: 280px;
+}
+#new-project-modal-box label { display: block; margin-bottom: 8px; }
+#new-project-modal-box input, #new-project-modal-box select { width: 100%; box-sizing: border-box; }
+
 #instructions-list { font-size: 13px; padding-left: 20px; }
 #instructions-list li { margin-bottom: 2px; }

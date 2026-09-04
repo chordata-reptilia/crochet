@@ -50,6 +50,23 @@
     </div>
   </div>
 
+  <div id="new-project-modal" hidden>
+    <div id="new-project-modal-box">
+      <h3>Nouveau motif</h3>
+      <label>Nom :<br /><input type="text" id="new-project-name" value="Nouveau motif" /></label><br />
+      <label>Largeur (mailles) :<br /><input type="number" id="new-project-width" value="20" min="1" /></label><br />
+      <label>Hauteur (mailles) :<br /><input type="number" id="new-project-height" value="20" min="1" /></label><br />
+      <label>Mode :<br />
+        <select id="new-project-mode">
+          <option value="classic">Grille classique</option>
+          <option value="c2c">Corner-to-Corner (C2C)</option>
+        </select>
+      </label><br />
+      <button id="new-project-confirm">Créer</button>
+      <button id="new-project-cancel">Annuler</button>
+    </div>
+  </div>
+
   <script src="../src/grid.js"></script>
   <script src="../src/palette.js"></script>
   <script src="../src/project.js"></script>
