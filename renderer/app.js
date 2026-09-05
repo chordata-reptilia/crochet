@@ -347,8 +347,34 @@ document.getElementById('export-png-btn').addEventListener('click', async () => 
   }
 });
 
-document.getElementById('export-pdf-btn').addEventListener('click', async () => {
-  const dataUrl = canvas.toDataURL('image/png');
+const pdfExportModal = document.getElementById('pdf-export-modal');
+
+document.getElementById('export-pdf-btn').addEventListener('click', () => {
+  pdfExportModal.hidden = false;
+});
+
+document.getElementById('pdf-export-cancel').addEventListener('click', () => {
+  pdfExportModal.hidden = true;
+});
+
+document.querySelectorAll('.pdf-orientation-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pdf-orientation-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.getElementById('pdf-export-confirm').addEventListener('click', async () => {
+  const orientation = document.querySelector('.pdf-orientation-btn.active').dataset.orientation;
+  const paperSize = document.getElementById('pdf-paper-size').value;
+  const marginMm = parseFloat(document.getElementById('pdf-margin-mm').value);
+  const instructionsPosition = document.getElementById('pdf-instructions-position').value;
+
+  if (!Number.isFinite(marginMm) || marginMm < 0) {
+    alert('La marge doit être un nombre positif.');
+    return;
+  }
+
   const project = {
     name: '',
     mode: AppState.mode,
@@ -357,9 +383,24 @@ document.getElementById('export-pdf-btn').addEventListener('click', async () => 
     palette: AppState.palette,
     cells: AppState.grid.cells,
   };
-  const instructions = generateInstructions(project);
-  const result = await window.api.exportPdf({ dataUrl, instructions });
-  if (!result.success && !result.canceled) {
+  const instructions = instructionsPosition === 'none' ? [] : generateInstructions(project);
+
+  const chart = {
+    width: AppState.grid.width,
+    height: AppState.grid.height,
+    cells: AppState.grid.cells,
+    palette: AppState.palette,
+  };
+
+  const result = await window.api.exportPdf({
+    chart,
+    instructions,
+    options: { orientation, paperSize, marginMm, instructionsPosition },
+  });
+
+  if (result.success) {
+    pdfExportModal.hidden = true;
+  } else if (!result.canceled) {
     alert(`Erreur lors de l'export PDF : ${result.error}`);
   }
 });
