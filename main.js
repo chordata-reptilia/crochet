@@ -66,14 +66,31 @@ ipcMain.handle('export:png', async (_event, dataUrl) => {
   }
 });
 
-ipcMain.handle('export:pdf', async (_event, { dataUrl, instructions }) => {
+const VALID_PAPER_SIZES = ['A4', 'Letter'];
+const VALID_ORIENTATIONS = ['portrait', 'landscape'];
+const VALID_INSTRUCTIONS_POSITIONS = ['before', 'after', 'none'];
+
+ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) => {
+  if (!VALID_PAPER_SIZES.includes(options.paperSize)) {
+    return { success: false, error: `Format papier invalide : ${options.paperSize}` };
+  }
+  if (!VALID_ORIENTATIONS.includes(options.orientation)) {
+    return { success: false, error: `Orientation invalide : ${options.orientation}` };
+  }
+  if (!VALID_INSTRUCTIONS_POSITIONS.includes(options.instructionsPosition)) {
+    return { success: false, error: `Position des instructions invalide : ${options.instructionsPosition}` };
+  }
+  if (typeof options.marginMm !== 'number' || !Number.isFinite(options.marginMm) || options.marginMm < 0) {
+    return { success: false, error: 'La marge doit être un nombre positif.' };
+  }
+
   const result = await dialog.showSaveDialog(mainWindow, {
     filters: [{ name: 'PDF', extensions: ['pdf'] }],
     defaultPath: 'motif.pdf',
   });
   if (result.canceled || !result.filePath) return { success: false, canceled: true };
   try {
-    await buildPdf({ imageDataUrl: dataUrl, instructions, outputPath: result.filePath });
+    await buildPdf({ chart, instructions, options, outputPath: result.filePath });
     return { success: true, path: result.filePath };
   } catch (err) {
     return { success: false, error: err.message };
