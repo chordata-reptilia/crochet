@@ -46,7 +46,7 @@ function buildPdf({ chart, instructions, options, outputPath }) {
 
     function writeInstructions() {
       ensureFreshPage();
-      doc.fontSize(14).text('Instructions', { underline: true });
+      doc.fillColor('#000000').fontSize(14).text('Instructions', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11);
       instructions.forEach((line) => doc.text(line));
@@ -87,7 +87,7 @@ function buildPdf({ chart, instructions, options, outputPath }) {
           doc
             .fontSize(9)
             .fillColor('#000000')
-            .text(`Page ${gridPageNum}/${totalGridPages}`, 0, layout.pageHeightPt - 20, {
+            .text(`Page ${gridPageNum}/${totalGridPages}`, 0, layout.pageHeightPt - layout.marginPt - 14, {
               width: layout.pageWidthPt,
               align: 'center',
             });

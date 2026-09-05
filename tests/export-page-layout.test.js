@@ -34,3 +34,11 @@ test('throws when the margin leaves no printable area', () => {
   expect(() => computePageLayout({ width: 10, height: 10, paperSize: 'A4', orientation: 'portrait', marginMm: 150 }))
     .toThrow(/marge/i);
 });
+
+test('throws when the margin leaves less than one full cell of printable width', () => {
+  // marginMm=103 on A4 portrait: printableWidthPt ~= 11.34pt, which is positive
+  // but smaller than CELL_PT (14pt) -- must be rejected rather than silently
+  // clamped to 1 cell per page-column.
+  expect(() => computePageLayout({ width: 10, height: 10, paperSize: 'A4', orientation: 'portrait', marginMm: 103 }))
+    .toThrow(/marge/i);
+});

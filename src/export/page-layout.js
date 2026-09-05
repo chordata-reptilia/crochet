@@ -5,6 +5,9 @@ const PAPER_SIZES_PT = {
 
 const CELL_PT = 14;
 const MM_TO_PT = 72 / 25.4;
+// Vertical space reserved on every grid page for the "Page X/Y" footer text,
+// so the footer never overlaps the last row of drawn cells.
+const FOOTER_HEIGHT_PT = 14;
 
 function computePageLayout({ width, height, paperSize, orientation, marginMm }) {
   const base = PAPER_SIZES_PT[paperSize];
@@ -16,9 +19,13 @@ function computePageLayout({ width, height, paperSize, orientation, marginMm }) 
   const pageHeightPt = orientation === 'landscape' ? base.width : base.height;
   const marginPt = marginMm * MM_TO_PT;
   const printableWidthPt = pageWidthPt - 2 * marginPt;
-  const printableHeightPt = pageHeightPt - 2 * marginPt;
+  const printableHeightPt = pageHeightPt - 2 * marginPt - FOOTER_HEIGHT_PT;
 
   if (printableWidthPt <= 0 || printableHeightPt <= 0) {
+    throw new Error('La marge choisie est trop grande pour ce format de papier.');
+  }
+
+  if (printableWidthPt < CELL_PT || printableHeightPt < CELL_PT) {
     throw new Error('La marge choisie est trop grande pour ce format de papier.');
   }
 
