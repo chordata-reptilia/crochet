@@ -71,6 +71,9 @@ const VALID_ORIENTATIONS = ['portrait', 'landscape'];
 const VALID_INSTRUCTIONS_POSITIONS = ['before', 'after', 'none'];
 
 ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) => {
+  if (!options || typeof options !== 'object') {
+    return { success: false, error: 'Les options d\'export sont requises.' };
+  }
   if (!VALID_PAPER_SIZES.includes(options.paperSize)) {
     return { success: false, error: `Format papier invalide : ${options.paperSize}` };
   }
