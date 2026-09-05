@@ -40,3 +40,24 @@ body { margin: 0; font-family: sans-serif; }
 
 #instructions-list { font-size: 13px; padding-left: 20px; }
 #instructions-list li { margin-bottom: 2px; }
+
+#pdf-export-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+#pdf-export-modal:not([hidden]) { display: flex; }
+#pdf-export-modal-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  min-width: 280px;
+}
+#pdf-export-modal-box label { display: block; margin-bottom: 8px; }
+#pdf-export-modal-box select, #pdf-export-modal-box input { width: 100%; box-sizing: border-box; }
+.pdf-orientation-buttons { display: flex; gap: 4px; }
+.pdf-orientation-btn { flex: 1; }
+.pdf-orientation-btn.active { font-weight: bold; outline: 2px solid #333; }

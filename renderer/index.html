@@ -67,6 +67,36 @@
     </div>
   </div>
 
+  <div id="pdf-export-modal" hidden>
+    <div id="pdf-export-modal-box">
+      <h3>Exporter en PDF</h3>
+      <label>Orientation :<br />
+        <div class="pdf-orientation-buttons">
+          <button type="button" id="pdf-orientation-portrait" class="pdf-orientation-btn active" data-orientation="portrait">Portrait</button>
+          <button type="button" id="pdf-orientation-landscape" class="pdf-orientation-btn" data-orientation="landscape">Paysage</button>
+        </div>
+      </label><br />
+      <label>Format papier :<br />
+        <select id="pdf-paper-size">
+          <option value="A4">A4</option>
+          <option value="Letter">Letter</option>
+        </select>
+      </label><br />
+      <label>Marge (mm) :<br />
+        <input type="number" id="pdf-margin-mm" value="10" min="0" />
+      </label><br />
+      <label>Instructions :<br />
+        <select id="pdf-instructions-position">
+          <option value="before">Avant la grille</option>
+          <option value="after" selected>Après la grille</option>
+          <option value="none">Aucune</option>
+        </select>
+      </label><br />
+      <button id="pdf-export-confirm">Exporter</button>
+      <button id="pdf-export-cancel">Annuler</button>
+    </div>
+  </div>
+
   <script src="../src/grid.js"></script>
   <script src="../src/palette.js"></script>
   <script src="../src/project.js"></script>
