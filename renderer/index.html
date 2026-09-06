@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="graphite">
+<html lang="fr" data-theme="graphite" data-mode="dark">
 <head>
   <meta charset="UTF-8" />
   <title>Crochet Pattern Designer</title>
@@ -10,27 +10,28 @@
   <div id="app">
     <header id="toolbar">
       <div id="app-brand">Crochet</div>
-      <button id="new-project-btn">Nouveau</button>
-      <button id="open-project-btn">Ouvrir</button>
-      <button id="save-project-btn">Enregistrer</button>
+      <button id="new-project-btn" title="Nouveau (Ctrl+N)">Nouveau</button>
+      <button id="open-project-btn" title="Ouvrir (Ctrl+O)">Ouvrir</button>
+      <button id="save-project-btn" title="Enregistrer (Ctrl+S)">Enregistrer</button>
+      <button id="resize-project-btn" title="Redimensionner la grille">Redimensionner</button>
       <span class="toolbar-sep"></span>
-      <button id="export-png-btn">Exporter PNG</button>
-      <button id="export-pdf-btn">Exporter PDF</button>
+      <button id="export-png-btn" title="Exporter PNG (Ctrl+Maj+P)">Exporter PNG</button>
+      <button id="export-pdf-btn" title="Exporter PDF (Ctrl+Maj+D)">Exporter PDF</button>
       <span class="toolbar-sep"></span>
-      <button id="undo-btn">Annuler</button>
-      <button id="redo-btn">Rétablir</button>
+      <button id="undo-btn" title="Annuler (Ctrl+Z)">Annuler</button>
+      <button id="redo-btn" title="Rétablir (Ctrl+Y)">Rétablir</button>
       <span class="toolbar-sep"></span>
-      <button id="zoom-in">Zoom +</button>
-      <button id="zoom-out">Zoom -</button>
+      <button id="zoom-in" title="Zoom + (Ctrl+ +)">Zoom +</button>
+      <button id="zoom-out" title="Zoom - (Ctrl+ -)">Zoom -</button>
       <span class="toolbar-spacer"></span>
       <button id="settings-btn">Réglages</button>
     </header>
     <div id="main-row">
       <aside id="tool-rail">
-        <button id="tool-brush" class="tool-btn active" data-tool="brush">Pinceau</button>
-        <button id="tool-bucket" class="tool-btn" data-tool="bucket">Seau</button>
-        <button id="tool-eraser" class="tool-btn" data-tool="eraser">Gomme</button>
-        <button id="tool-eyedropper" class="tool-btn" data-tool="eyedropper">Pipette</button>
+        <button id="tool-brush" class="tool-btn active" data-tool="brush" title="Pinceau (1)">Pinceau</button>
+        <button id="tool-bucket" class="tool-btn" data-tool="bucket" title="Seau (2)">Seau</button>
+        <button id="tool-eraser" class="tool-btn" data-tool="eraser" title="Gomme (3)">Gomme</button>
+        <button id="tool-eyedropper" class="tool-btn" data-tool="eyedropper" title="Pipette (4)">Pipette</button>
       </aside>
       <main id="workspace">
         <canvas id="grid-canvas"></canvas>
@@ -83,6 +84,17 @@
       </label><br />
       <button id="new-project-confirm">Créer</button>
       <button id="new-project-cancel">Annuler</button>
+    </div>
+  </div>
+
+  <div id="resize-project-modal" hidden>
+    <div id="resize-project-modal-box">
+      <h3>Redimensionner la grille</h3>
+      <p>Les mailles hors des nouvelles dimensions sont perdues ; les mailles existantes dans la zone conservée sont préservées.</p>
+      <label>Largeur (mailles) :<br /><input type="number" id="resize-project-width" value="20" min="1" /></label><br />
+      <label>Hauteur (mailles) :<br /><input type="number" id="resize-project-height" value="20" min="1" /></label><br />
+      <button id="resize-project-confirm">Redimensionner</button>
+      <button id="resize-project-cancel">Annuler</button>
     </div>
   </div>
 
@@ -159,6 +171,11 @@
         <button type="button" class="theme-option" data-theme="granny">Crochet</button>
         <button type="button" class="theme-option" data-theme="lightstick">K-pop</button>
         <button type="button" class="theme-option" data-theme="washi">Japon</button>
+      </div>
+      <p>Apparence :</p>
+      <div id="mode-picker">
+        <button type="button" class="mode-option" data-mode="light">Clair</button>
+        <button type="button" class="mode-option" data-mode="dark">Sombre</button>
       </div>
       <button id="settings-close">Fermer</button>
     </div>

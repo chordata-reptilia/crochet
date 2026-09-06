@@ -165,15 +165,42 @@ canvas.addEventListener('wheel', (evt) => {
 }, { passive: false });
 
 window.addEventListener('keydown', (evt) => {
-  if (!newProjectModal.hidden) return;
+  const isTypingContext = evt.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(evt.target.tagName);
+  if (isTypingContext) return;
+
   const key = evt.key.toLowerCase();
-  if ((evt.ctrlKey || evt.metaKey) && key === 'z' && !evt.shiftKey) {
+  const primaryModifier = evt.ctrlKey || evt.metaKey;
+
+  if (primaryModifier && key === 'z' && !evt.shiftKey) {
     evt.preventDefault();
     undo();
-  } else if ((evt.ctrlKey || evt.metaKey) && (key === 'y' || (key === 'z' && evt.shiftKey))) {
+    return;
+  }
+  if (primaryModifier && (key === 'y' || (key === 'z' && evt.shiftKey))) {
     evt.preventDefault();
     redo();
+    return;
   }
+
+  const anyModalOpen = !newProjectModal.hidden || !pdfExportModal.hidden || !settingsModal.hidden || !resizeProjectModal.hidden;
+
+  if (primaryModifier) {
+    if (key === 'n') { evt.preventDefault(); if (!anyModalOpen) document.getElementById('new-project-btn').click(); }
+    else if (key === 'o') { evt.preventDefault(); if (!anyModalOpen) document.getElementById('open-project-btn').click(); }
+    else if (key === 's') { evt.preventDefault(); if (!anyModalOpen) document.getElementById('save-project-btn').click(); }
+    else if (evt.shiftKey && key === 'p') { evt.preventDefault(); if (!anyModalOpen) document.getElementById('export-png-btn').click(); }
+    else if (evt.shiftKey && key === 'd') { evt.preventDefault(); if (!anyModalOpen) document.getElementById('export-pdf-btn').click(); }
+    else if (key === '=' || key === '+') { evt.preventDefault(); document.getElementById('zoom-in').click(); }
+    else if (key === '-') { evt.preventDefault(); document.getElementById('zoom-out').click(); }
+    return;
+  }
+
+  if (anyModalOpen) return;
+
+  if (key === '1') document.getElementById('tool-brush').click();
+  else if (key === '2') document.getElementById('tool-bucket').click();
+  else if (key === '3') document.getElementById('tool-eraser').click();
+  else if (key === '4') document.getElementById('tool-eyedropper').click();
 });
 
 const colorGridEl = document.getElementById('color-grid');
@@ -307,6 +334,32 @@ document.getElementById('new-project-confirm').addEventListener('click', () => {
   const project = createProject({ name, mode, width, height });
   loadProjectIntoState(project);
   newProjectModal.hidden = true;
+});
+
+const resizeProjectModal = document.getElementById('resize-project-modal');
+
+document.getElementById('resize-project-btn').addEventListener('click', () => {
+  document.getElementById('resize-project-width').value = String(AppState.grid.width);
+  document.getElementById('resize-project-height').value = String(AppState.grid.height);
+  resizeProjectModal.hidden = false;
+});
+
+document.getElementById('resize-project-cancel').addEventListener('click', () => {
+  resizeProjectModal.hidden = true;
+});
+
+document.getElementById('resize-project-confirm').addEventListener('click', () => {
+  const width = parseInt(document.getElementById('resize-project-width').value, 10);
+  const height = parseInt(document.getElementById('resize-project-height').value, 10);
+  if (!Number.isInteger(width) || width <= 0 || !Number.isInteger(height) || height <= 0) {
+    alert('Largeur et hauteur doivent être des nombres entiers positifs.');
+    return;
+  }
+  pushHistory(AppState.grid);
+  AppState.grid = resizeGrid(AppState.grid, width, height);
+  resizeProjectModal.hidden = true;
+  renderGrid();
+  renderInstructions();
 });
 
 document.getElementById('save-project-btn').addEventListener('click', async () => {
@@ -548,6 +601,41 @@ document.querySelectorAll('.theme-option').forEach((btn) => {
     applyTheme(theme);
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (err) {
+      // localStorage unavailable — the choice just won't persist across restarts.
+    }
+  });
+});
+
+const MODE_STORAGE_KEY = 'crochet-mode';
+const VALID_MODES = ['light', 'dark'];
+
+function applyMode(mode) {
+  document.documentElement.dataset.mode = mode;
+  document.querySelectorAll('.mode-option').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  renderGrid();
+}
+
+function loadStoredMode() {
+  try {
+    const stored = localStorage.getItem(MODE_STORAGE_KEY);
+    if (stored && VALID_MODES.includes(stored)) return stored;
+  } catch (err) {
+    // localStorage unavailable (e.g. disabled) — fall back to the default mode.
+  }
+  return document.documentElement.dataset.mode;
+}
+
+applyMode(loadStoredMode());
+
+document.querySelectorAll('.mode-option').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    applyMode(mode);
+    try {
+      localStorage.setItem(MODE_STORAGE_KEY, mode);
     } catch (err) {
       // localStorage unavailable — the choice just won't persist across restarts.
     }

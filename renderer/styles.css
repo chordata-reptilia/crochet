@@ -1,12 +1,13 @@
 * { box-sizing: border-box; }
 
 /* ============================================================
-   Theme tokens — one block per theme, selected via [data-theme]
-   on <html> (set in index.html, switched from the Réglages modal,
-   persisted to localStorage in app.js).
+   Theme tokens — one block per [data-theme][data-mode] pair, set
+   on <html> (defaults in index.html, switched from the Réglages
+   modal, persisted to localStorage in app.js). Each of the 4
+   validated art directions ships both a light and a dark variant.
    ============================================================ */
 :root,
-[data-theme="graphite"] {
+[data-theme="graphite"][data-mode="dark"] {
   --bg: #0F1012;
   --toolbar-bg: #131418;
   --panel-bg: #131418;
@@ -21,6 +22,7 @@
   --radius-pill: 2px;
   --font-body: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
   --font-heading: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --heading-weight: 600;
   --heading-transform: uppercase;
   --heading-tracking: .12em;
   --grid-empty-bg: #22242A;
@@ -28,7 +30,30 @@
   --glow: none;
 }
 
-[data-theme="granny"] {
+[data-theme="graphite"][data-mode="light"] {
+  --bg: #F4F4F5;
+  --toolbar-bg: #FFFFFF;
+  --panel-bg: #FFFFFF;
+  --border: #D7D8DB;
+  --border-width: 1px;
+  --text: #2A2B2E;
+  --text-strong: #000000;
+  --text-muted: #6B6E76;
+  --accent: #1A1B1E;
+  --accent-contrast: #FFFFFF;
+  --radius: 0px;
+  --radius-pill: 2px;
+  --font-body: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --font-heading: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --heading-weight: 600;
+  --heading-transform: uppercase;
+  --heading-tracking: .12em;
+  --grid-empty-bg: #F0F0F1;
+  --grid-line: #D7D8DB;
+  --glow: none;
+}
+
+[data-theme="granny"][data-mode="dark"] {
   --bg: #2B2A2E;
   --toolbar-bg: #2B2A2E;
   --panel-bg: #363540;
@@ -43,6 +68,7 @@
   --radius-pill: 20px;
   --font-body: 'Nunito Sans', system-ui, sans-serif;
   --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --heading-weight: 800;
   --heading-transform: none;
   --heading-tracking: -0.01em;
   --grid-empty-bg: #363540;
@@ -50,7 +76,30 @@
   --glow: none;
 }
 
-[data-theme="lightstick"] {
+[data-theme="granny"][data-mode="light"] {
+  --bg: #F5EFE3;
+  --toolbar-bg: #FBF6EC;
+  --panel-bg: #FBF6EC;
+  --border: #C9B79A;
+  --border-width: 3px;
+  --text: #2E2A22;
+  --text-strong: #1D1A15;
+  --text-muted: #8B8271;
+  --accent: #2BB3A3;
+  --accent-contrast: #1F1E22;
+  --radius: 18px;
+  --radius-pill: 20px;
+  --font-body: 'Nunito Sans', system-ui, sans-serif;
+  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --heading-weight: 800;
+  --heading-transform: none;
+  --heading-tracking: -0.01em;
+  --grid-empty-bg: #FBF6EC;
+  --grid-line: #C9B79A;
+  --glow: none;
+}
+
+[data-theme="lightstick"][data-mode="dark"] {
   --bg: #0B0714;
   --toolbar-bg: #14102A;
   --panel-bg: #14102A;
@@ -65,6 +114,7 @@
   --radius-pill: 4px;
   --font-body: 'Manrope', system-ui, sans-serif;
   --font-heading: 'Unbounded', system-ui, sans-serif;
+  --heading-weight: 800;
   --heading-transform: uppercase;
   --heading-tracking: .1em;
   --grid-empty-bg: #14102A;
@@ -72,7 +122,30 @@
   --glow: 0 0 14px rgba(53, 228, 255, .45);
 }
 
-[data-theme="washi"] {
+[data-theme="lightstick"][data-mode="light"] {
+  --bg: #F3F0FF;
+  --toolbar-bg: #FFFFFF;
+  --panel-bg: #FFFFFF;
+  --border: #D9D2F5;
+  --border-width: 1px;
+  --text: #221B3D;
+  --text-strong: #120C29;
+  --text-muted: #6E64A0;
+  --accent: #0FBBDA;
+  --accent-contrast: #FFFFFF;
+  --radius: 4px;
+  --radius-pill: 4px;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-heading: 'Unbounded', system-ui, sans-serif;
+  --heading-weight: 800;
+  --heading-transform: uppercase;
+  --heading-tracking: .1em;
+  --grid-empty-bg: #FFFFFF;
+  --grid-line: #D9D2F5;
+  --glow: 0 2px 10px rgba(15, 187, 218, .35);
+}
+
+[data-theme="washi"][data-mode="light"] {
   --bg: #F4EFE6;
   --toolbar-bg: #F4EFE6;
   --panel-bg: #F4EFE6;
@@ -87,10 +160,34 @@
   --radius-pill: 0px;
   --font-body: 'Zen Kaku Gothic New', system-ui, sans-serif;
   --font-heading: 'Shippori Mincho', serif;
+  --heading-weight: 700;
   --heading-transform: none;
   --heading-tracking: .2em;
   --grid-empty-bg: #FFFFFF;
   --grid-line: #2A2623;
+  --glow: none;
+}
+
+[data-theme="washi"][data-mode="dark"] {
+  --bg: #211D1A;
+  --toolbar-bg: #2A2420;
+  --panel-bg: #2A2420;
+  --border: #4A423A;
+  --border-width: 1px;
+  --text: #EDE6DA;
+  --text-strong: #FFFFFF;
+  --text-muted: #9A8E7E;
+  --accent: #C8462E;
+  --accent-contrast: #F4EFE6;
+  --radius: 0px;
+  --radius-pill: 0px;
+  --font-body: 'Zen Kaku Gothic New', system-ui, sans-serif;
+  --font-heading: 'Shippori Mincho', serif;
+  --heading-weight: 700;
+  --heading-transform: none;
+  --heading-tracking: .2em;
+  --grid-empty-bg: #2A2420;
+  --grid-line: #4A423A;
   --glow: none;
 }
 
@@ -131,6 +228,10 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-pill);
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 #toolbar button:hover { color: var(--text-strong); border-color: var(--accent); }
 .toolbar-sep { display: inline-block; width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
@@ -151,7 +252,7 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
 }
 .tool-btn {
   font-family: var(--font-body);
-  font-size: 10px;
+  font-size: 9px;
   line-height: 1.2;
   padding: 8px 2px;
   background: transparent;
@@ -159,7 +260,8 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
   text-align: center;
 }
 .tool-btn.active {
@@ -186,9 +288,10 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   text-transform: var(--heading-transform);
   letter-spacing: var(--heading-tracking);
   color: var(--text-strong);
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: var(--heading-weight, 600);
   margin: 0 0 10px;
+  overflow-wrap: break-word;
 }
 
 /* Crochet — dashed "stitch" rule under each heading */
@@ -215,17 +318,18 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
 /* Japon — vertical kanji + label, read top-to-bottom */
 [data-theme="washi"] .panel-heading {
   writing-mode: vertical-rl;
-  font-size: 13px;
-  letter-spacing: .2em;
+  font-size: 11px;
+  letter-spacing: .12em;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  max-height: 90px;
   margin-bottom: 8px;
 }
 [data-theme="washi"] .panel-heading::before {
   content: attr(data-kanji);
   font-family: var(--font-heading);
-  font-size: 16px;
+  font-size: 14px;
 }
 
 /* ============================================================
@@ -300,6 +404,7 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
    Modals (new project, PDF export, settings) — shared chrome
    ============================================================ */
 #new-project-modal,
+#resize-project-modal,
 #pdf-export-modal,
 #settings-modal {
   position: fixed;
@@ -310,10 +415,12 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   z-index: 10;
 }
 #new-project-modal:not([hidden]),
+#resize-project-modal:not([hidden]),
 #pdf-export-modal:not([hidden]),
 #settings-modal:not([hidden]) { display: flex; }
 
 #new-project-modal-box,
+#resize-project-modal-box,
 #pdf-export-modal-box,
 #settings-modal-box {
   background: var(--panel-bg);
@@ -325,6 +432,7 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   min-width: 280px;
 }
 #new-project-modal-box h3,
+#resize-project-modal-box h3,
 #pdf-export-modal-box h3,
 #settings-modal-box h3 {
   font-family: var(--font-heading);
@@ -332,8 +440,10 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   text-transform: var(--heading-transform);
   letter-spacing: var(--heading-tracking);
 }
-#new-project-modal-box label { display: block; margin-bottom: 8px; }
-#new-project-modal-box input, #new-project-modal-box select {
+#new-project-modal-box label, #resize-project-modal-box label { display: block; margin-bottom: 8px; }
+#resize-project-modal-box p { font-size: 12px; color: var(--text-muted); max-width: 320px; }
+#new-project-modal-box input, #new-project-modal-box select,
+#resize-project-modal-box input {
   width: 100%;
   box-sizing: border-box;
   font-family: var(--font-body);
@@ -343,7 +453,7 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   border-radius: var(--radius-pill);
   padding: 4px 6px;
 }
-#new-project-modal-box button, #pdf-export-modal-box button, #settings-modal-box button {
+#new-project-modal-box button, #resize-project-modal-box button, #pdf-export-modal-box button, #settings-modal-box button {
   font-family: var(--font-body);
   background: var(--panel-bg);
   color: var(--text);
@@ -390,3 +500,16 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   cursor: pointer;
 }
 .theme-option.active { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+#mode-picker { display: flex; gap: 8px; margin: 12px 0 18px; }
+.mode-option {
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 8px 14px;
+  background: var(--bg);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+.mode-option.active { outline: 2px solid var(--accent); outline-offset: 2px; }
