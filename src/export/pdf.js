@@ -1,6 +1,8 @@
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const { computePageLayout } = require('./page-layout');
+const { buildLegendRows } = require('../legend');
+const { drawLegendSection } = require('./legend');
 
 function cellColorHex(chart, colorId) {
   if (!colorId) return '#ffffff';
@@ -17,7 +19,8 @@ function buildPdf({ chart, instructions, options, outputPath }) {
         height: chart.height,
         paperSize: options.paperSize,
         orientation: options.orientation,
-        marginMm: options.marginMm,
+        marginValue: options.marginValue,
+        marginUnit: options.marginUnit,
       });
     } catch (err) {
       reject(err);
@@ -93,6 +96,14 @@ function buildPdf({ chart, instructions, options, outputPath }) {
             });
         }
       }
+    }
+
+    if (options.includeLegend) {
+      drawLegendSection(doc, buildLegendRows(chart), {
+        pageHeightPt: layout.pageHeightPt,
+        marginPt: layout.marginPt,
+        ensureFreshPage,
+      });
     }
 
     if (options.instructionsPosition === 'after') {
