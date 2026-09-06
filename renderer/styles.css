@@ -1,70 +1,359 @@
 * { box-sizing: border-box; }
-body { margin: 0; font-family: sans-serif; }
+
+/* ============================================================
+   Theme tokens — one block per theme, selected via [data-theme]
+   on <html> (set in index.html, switched from the Réglages modal,
+   persisted to localStorage in app.js).
+   ============================================================ */
+:root,
+[data-theme="graphite"] {
+  --bg: #0F1012;
+  --toolbar-bg: #131418;
+  --panel-bg: #131418;
+  --border: #26282D;
+  --border-width: 1px;
+  --text: #E6E6E3;
+  --text-strong: #ECEBE6;
+  --text-muted: #7C7F87;
+  --accent: #ECEBE6;
+  --accent-contrast: #0F1012;
+  --radius: 0px;
+  --radius-pill: 2px;
+  --font-body: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --font-heading: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --heading-transform: uppercase;
+  --heading-tracking: .12em;
+  --grid-empty-bg: #22242A;
+  --grid-line: #3A3C42;
+  --glow: none;
+}
+
+[data-theme="granny"] {
+  --bg: #2B2A2E;
+  --toolbar-bg: #2B2A2E;
+  --panel-bg: #363540;
+  --border: #45444F;
+  --border-width: 3px;
+  --text: #F2EEE6;
+  --text-strong: #FFFFFF;
+  --text-muted: #A8A6B0;
+  --accent: #2BB3A3;
+  --accent-contrast: #1F1E22;
+  --radius: 18px;
+  --radius-pill: 20px;
+  --font-body: 'Nunito Sans', system-ui, sans-serif;
+  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --heading-transform: none;
+  --heading-tracking: -0.01em;
+  --grid-empty-bg: #363540;
+  --grid-line: #45444F;
+  --glow: none;
+}
+
+[data-theme="lightstick"] {
+  --bg: #0B0714;
+  --toolbar-bg: #14102A;
+  --panel-bg: #14102A;
+  --border: #2A2352;
+  --border-width: 1px;
+  --text: #F4F0FF;
+  --text-strong: #FFFFFF;
+  --text-muted: #B9B3D9;
+  --accent: #35E4FF;
+  --accent-contrast: #0B0714;
+  --radius: 4px;
+  --radius-pill: 4px;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-heading: 'Unbounded', system-ui, sans-serif;
+  --heading-transform: uppercase;
+  --heading-tracking: .1em;
+  --grid-empty-bg: #14102A;
+  --grid-line: #2A2352;
+  --glow: 0 0 14px rgba(53, 228, 255, .45);
+}
+
+[data-theme="washi"] {
+  --bg: #F4EFE6;
+  --toolbar-bg: #F4EFE6;
+  --panel-bg: #F4EFE6;
+  --border: #2A2623;
+  --border-width: 1px;
+  --text: #2A2623;
+  --text-strong: #2A2623;
+  --text-muted: #9A928A;
+  --accent: #C8462E;
+  --accent-contrast: #F4EFE6;
+  --radius: 0px;
+  --radius-pill: 0px;
+  --font-body: 'Zen Kaku Gothic New', system-ui, sans-serif;
+  --font-heading: 'Shippori Mincho', serif;
+  --heading-transform: none;
+  --heading-tracking: .2em;
+  --grid-empty-bg: #FFFFFF;
+  --grid-line: #2A2623;
+  --glow: none;
+}
+
+/* ============================================================
+   Layout — shared structure across all themes (toolbar, left
+   tool rail, workspace, side panel). Only look-and-feel below
+   this point reads the tokens above; the arrangement itself
+   does not change per theme.
+   ============================================================ */
+body { margin: 0; font-family: var(--font-body); background: var(--bg); color: var(--text); }
 #app { display: flex; flex-direction: column; height: 100vh; }
-#toolbar { padding: 8px; border-bottom: 1px solid #ccc; }
+
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--toolbar-bg);
+  border-bottom: var(--border-width) solid var(--border);
+}
+#app-brand {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-strong);
+  margin-right: 8px;
+  letter-spacing: var(--heading-tracking);
+}
+#toolbar button {
+  font-family: var(--font-body);
+  font-size: 11px;
+  height: 26px;
+  padding: 0 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+#toolbar button:hover { color: var(--text-strong); border-color: var(--accent); }
+.toolbar-sep { display: inline-block; width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+.toolbar-spacer { flex: 1; }
+
 #main-row { display: flex; flex-direction: row; flex: 1; overflow: hidden; }
-#workspace { flex: 1; display: flex; overflow: auto; }
-#grid-canvas { image-rendering: pixelated; display: block; align-self: flex-start; }
-#side-panel { width: 280px; border-left: 1px solid #ccc; overflow-y: auto; padding: 8px; }
 
-.tool-btn { margin-right: 4px; }
-.tool-btn.active { font-weight: bold; outline: 2px solid #333; }
-.toolbar-sep { display: inline-block; width: 16px; }
-#workspace { cursor: crosshair; }
+#tool-rail {
+  width: 56px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 8px 6px;
+  background: var(--toolbar-bg);
+  border-right: var(--border-width) solid var(--border);
+}
+.tool-btn {
+  font-family: var(--font-body);
+  font-size: 10px;
+  line-height: 1.2;
+  padding: 8px 2px;
+  background: transparent;
+  color: var(--text-muted);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  word-break: break-word;
+  text-align: center;
+}
+.tool-btn.active {
+  color: var(--accent-contrast);
+  background: var(--accent);
+  box-shadow: var(--glow);
+}
 
+#workspace { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; cursor: crosshair; background: var(--bg); }
+#grid-canvas { image-rendering: pixelated; display: block; }
+
+#side-panel {
+  width: 300px;
+  flex-shrink: 0;
+  border-left: var(--border-width) solid var(--border);
+  background: var(--panel-bg);
+  overflow-y: auto;
+  padding: 14px;
+}
+#side-panel section { margin-bottom: 18px; }
+
+.panel-heading {
+  font-family: var(--font-heading);
+  text-transform: var(--heading-transform);
+  letter-spacing: var(--heading-tracking);
+  color: var(--text-strong);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+/* Crochet — dashed "stitch" rule under each heading */
+[data-theme="granny"] .panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+[data-theme="granny"] .panel-heading::after {
+  content: '';
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, var(--border) 0 8px, transparent 8px 14px);
+}
+
+/* K-pop — glowing uppercase label */
+[data-theme="lightstick"] .panel-heading {
+  color: var(--accent);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 40%, transparent);
+  font-size: 12px;
+}
+
+/* Japon — vertical kanji + label, read top-to-bottom */
+[data-theme="washi"] .panel-heading {
+  writing-mode: vertical-rl;
+  font-size: 13px;
+  letter-spacing: .2em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+[data-theme="washi"] .panel-heading::before {
+  content: attr(data-kanji);
+  font-family: var(--font-heading);
+  font-size: 16px;
+}
+
+/* ============================================================
+   Palette panel
+   ============================================================ */
 #color-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
-.color-grid-swatch { width: 24px; height: 24px; border: 1px solid #999; border-radius: 3px; cursor: pointer; }
-.color-grid-swatch.active { outline: 2px solid #333; outline-offset: 1px; }
+.color-grid-swatch { width: 24px; height: 24px; border: var(--border-width) solid var(--border); border-radius: var(--radius-pill); cursor: pointer; }
+.color-grid-swatch.active { outline: 2px solid var(--accent); outline-offset: 1px; }
 #color-detail-row { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
-#color-detail-name { flex: 1; }
-.swatch-remove { cursor: pointer; }
+#color-detail-name {
+  flex: 1;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 4px 6px;
+}
+.swatch-remove { cursor: pointer; color: var(--text-muted); }
+.swatch-remove:hover { color: var(--text-strong); }
 
 #color-picker-panel { margin-bottom: 8px; }
-#color-picker-sv, #color-picker-hue { display: block; width: 100%; cursor: crosshair; border: 1px solid #999; touch-action: none; }
+#color-picker-sv, #color-picker-hue { display: block; width: 100%; cursor: crosshair; border: var(--border-width) solid var(--border); border-radius: var(--radius-pill); touch-action: none; }
 #color-picker-sv { margin-bottom: 4px; }
 #color-picker-hue { margin-bottom: 6px; }
 #color-picker-shades { display: flex; gap: 3px; margin-bottom: 6px; }
-.color-picker-shade { flex: 1; height: 18px; border: 1px solid #999; cursor: pointer; }
+.color-picker-shade { flex: 1; height: 18px; border: var(--border-width) solid var(--border); border-radius: var(--radius-pill); cursor: pointer; }
 .color-picker-hex-row { display: flex; align-items: center; gap: 6px; }
-.color-picker-preview { width: 24px; height: 24px; border: 1px solid #999; flex-shrink: 0; border-radius: 3px; }
-.color-picker-hex-row input { flex: 1; }
-
-
-#new-project-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
+.color-picker-preview { width: 24px; height: 24px; border: var(--border-width) solid var(--border); border-radius: var(--radius-pill); flex-shrink: 0; }
+.color-picker-hex-row input {
+  flex: 1;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 4px 6px;
 }
-#new-project-modal:not([hidden]) { display: flex; }
-#new-project-modal-box {
-  background: #fff;
-  padding: 20px;
-  border-radius: 6px;
-  min-width: 280px;
-}
-#new-project-modal-box label { display: block; margin-bottom: 8px; }
-#new-project-modal-box input, #new-project-modal-box select { width: 100%; box-sizing: border-box; }
 
-#instructions-list { font-size: 13px; padding-left: 20px; }
+#add-color-btn {
+  width: 100%;
+  height: 30px;
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: var(--heading-transform);
+  letter-spacing: .08em;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  box-shadow: var(--glow);
+}
+
+#mode-select {
+  width: 100%;
+  height: 30px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0 8px;
+}
+
+#instructions-list { font-size: 13px; padding-left: 20px; color: var(--text); }
 #instructions-list li { margin-bottom: 2px; }
 
-#pdf-export-modal {
+/* ============================================================
+   Modals (new project, PDF export, settings) — shared chrome
+   ============================================================ */
+#new-project-modal,
+#pdf-export-modal,
+#settings-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   align-items: center;
   justify-content: center;
   z-index: 10;
 }
-#pdf-export-modal:not([hidden]) { display: flex; }
-#pdf-export-modal-box {
-  background: #fff;
+#new-project-modal:not([hidden]),
+#pdf-export-modal:not([hidden]),
+#settings-modal:not([hidden]) { display: flex; }
+
+#new-project-modal-box,
+#pdf-export-modal-box,
+#settings-modal-box {
+  background: var(--panel-bg);
+  color: var(--text);
+  font-family: var(--font-body);
   padding: 20px;
-  border-radius: 6px;
+  border-radius: var(--radius);
+  border: var(--border-width) solid var(--border);
   min-width: 280px;
+}
+#new-project-modal-box h3,
+#pdf-export-modal-box h3,
+#settings-modal-box h3 {
+  font-family: var(--font-heading);
+  color: var(--text-strong);
+  text-transform: var(--heading-transform);
+  letter-spacing: var(--heading-tracking);
+}
+#new-project-modal-box label { display: block; margin-bottom: 8px; }
+#new-project-modal-box input, #new-project-modal-box select {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 4px 6px;
+}
+#new-project-modal-box button, #pdf-export-modal-box button, #settings-modal-box button {
+  font-family: var(--font-body);
+  background: var(--panel-bg);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+#pdf-export-modal-box {
   max-width: 90vw;
   max-height: 90vh;
   overflow: auto;
@@ -72,13 +361,13 @@ body { margin: 0; font-family: sans-serif; }
 .pdf-export-modal-layout { display: flex; gap: 20px; }
 .pdf-export-modal-controls { flex: 0 0 280px; }
 .pdf-export-modal-preview { flex: 1 1 420px; min-width: 320px; display: flex; flex-direction: column; }
-#pdf-preview-frame { flex: 1; width: 100%; min-height: 480px; border: 1px solid #ccc; }
-.pdf-preview-error { color: #a00; font-size: 13px; margin-bottom: 8px; }
+#pdf-preview-frame { flex: 1; width: 100%; min-height: 480px; border: var(--border-width) solid var(--border); }
+.pdf-preview-error { color: var(--accent); font-size: 13px; margin-bottom: 8px; }
 #pdf-export-modal-box label { display: block; margin-bottom: 8px; }
 #pdf-export-modal-box select, #pdf-export-modal-box input { width: 100%; box-sizing: border-box; }
 .pdf-orientation-buttons { display: flex; gap: 4px; }
 .pdf-orientation-btn { flex: 1; }
-.pdf-orientation-btn.active { font-weight: bold; outline: 2px solid #333; }
+.pdf-orientation-btn.active { font-weight: bold; outline: 2px solid var(--accent); }
 .pdf-margin-row { display: flex; gap: 4px; }
 .pdf-margin-row input, .pdf-margin-row select { flex: 1; width: auto; }
 #pdf-export-modal-box input[type="checkbox"] { width: auto; }
@@ -86,3 +375,18 @@ body { margin: 0; font-family: sans-serif; }
 .pdf-legend-download-row { display: flex; gap: 4px; margin: 8px 0; }
 .pdf-legend-download-row button { flex: 2; }
 .pdf-legend-download-row select { flex: 1; width: auto; }
+
+/* Settings modal */
+#settings-modal-box { min-width: 320px; }
+#theme-picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+.theme-option {
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 8px 14px;
+  background: var(--bg);
+  color: var(--text);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+.theme-option.active { outline: 2px solid var(--accent); outline-offset: 2px; }

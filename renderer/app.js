@@ -45,15 +45,19 @@ function renderGrid() {
   canvas.width = grid.width * size;
   canvas.height = grid.height * size;
 
+  const themeVars = getComputedStyle(document.documentElement);
+  const emptyCellBg = themeVars.getPropertyValue('--grid-empty-bg').trim() || '#ffffff';
+  const gridLine = themeVars.getPropertyValue('--grid-line').trim() || '#dddddd';
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (let y = 0; y < grid.height; y++) {
     for (let x = 0; x < grid.width; x++) {
       const colorId = getCell(grid, x, y);
       const color = colorId ? findColor(AppState.palette || [], colorId) : null;
-      ctx.fillStyle = color ? color.hex : '#ffffff';
+      ctx.fillStyle = color ? color.hex : emptyCellBg;
       ctx.fillRect(x * size, y * size, size, size);
-      ctx.strokeStyle = '#ddd';
+      ctx.strokeStyle = gridLine;
       ctx.strokeRect(x * size, y * size, size, size);
     }
   }
@@ -513,4 +517,47 @@ document.getElementById('pdf-legend-download-btn').addEventListener('click', asy
   if (!result.success && !result.canceled) {
     alert(`Erreur lors du téléchargement de la légende : ${result.error}`);
   }
+});
+
+const THEME_STORAGE_KEY = 'crochet-theme';
+const VALID_THEMES = ['graphite', 'granny', 'lightstick', 'washi'];
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  document.querySelectorAll('.theme-option').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+  renderGrid();
+}
+
+function loadStoredTheme() {
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored && VALID_THEMES.includes(stored)) return stored;
+  } catch (err) {
+    // localStorage unavailable (e.g. disabled) — fall back to the default theme.
+  }
+  return document.documentElement.dataset.theme;
+}
+
+applyTheme(loadStoredTheme());
+
+document.querySelectorAll('.theme-option').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const theme = btn.dataset.theme;
+    applyTheme(theme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (err) {
+      // localStorage unavailable — the choice just won't persist across restarts.
+    }
+  });
+});
+
+const settingsModal = document.getElementById('settings-modal');
+document.getElementById('settings-btn').addEventListener('click', () => {
+  settingsModal.hidden = false;
+});
+document.getElementById('settings-close').addEventListener('click', () => {
+  settingsModal.hidden = true;
 });

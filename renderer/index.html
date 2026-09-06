@@ -1,35 +1,43 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="graphite">
 <head>
   <meta charset="UTF-8" />
   <title>Crochet Pattern Designer</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Bricolage+Grotesque:wght@600;800&family=Nunito+Sans:wght@400;600;700&family=Unbounded:wght@600;800&family=Manrope:wght@500;600;700&family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app">
     <header id="toolbar">
+      <div id="app-brand">Crochet</div>
       <button id="new-project-btn">Nouveau</button>
       <button id="open-project-btn">Ouvrir</button>
       <button id="save-project-btn">Enregistrer</button>
+      <span class="toolbar-sep"></span>
       <button id="export-png-btn">Exporter PNG</button>
       <button id="export-pdf-btn">Exporter PDF</button>
-      <button id="tool-brush" class="tool-btn active" data-tool="brush">Pinceau</button>
-      <button id="tool-bucket" class="tool-btn" data-tool="bucket">Seau</button>
-      <button id="tool-eraser" class="tool-btn" data-tool="eraser">Gomme</button>
-      <button id="tool-eyedropper" class="tool-btn" data-tool="eyedropper">Pipette</button>
       <span class="toolbar-sep"></span>
       <button id="undo-btn">Annuler</button>
       <button id="redo-btn">Rétablir</button>
+      <span class="toolbar-sep"></span>
       <button id="zoom-in">Zoom +</button>
       <button id="zoom-out">Zoom -</button>
+      <span class="toolbar-spacer"></span>
+      <button id="settings-btn">Réglages</button>
     </header>
     <div id="main-row">
+      <aside id="tool-rail">
+        <button id="tool-brush" class="tool-btn active" data-tool="brush">Pinceau</button>
+        <button id="tool-bucket" class="tool-btn" data-tool="bucket">Seau</button>
+        <button id="tool-eraser" class="tool-btn" data-tool="eraser">Gomme</button>
+        <button id="tool-eyedropper" class="tool-btn" data-tool="eyedropper">Pipette</button>
+      </aside>
       <main id="workspace">
         <canvas id="grid-canvas"></canvas>
       </main>
       <aside id="side-panel">
         <section id="palette-panel">
-          <h3>Couleurs</h3>
+          <h3 class="panel-heading" data-kanji="色">Couleurs</h3>
           <div id="color-grid"></div>
           <div id="color-detail-row" hidden>
             <input type="text" id="color-detail-name" placeholder="Nom" />
@@ -47,14 +55,14 @@
           <button id="add-color-btn">Ajouter</button>
         </section>
         <section id="mode-panel">
-          <h3>Mode</h3>
+          <h3 class="panel-heading" data-kanji="式">Mode</h3>
           <select id="mode-select">
             <option value="classic">Grille classique</option>
             <option value="c2c">Corner-to-Corner (C2C)</option>
           </select>
         </section>
         <section id="instructions-panel">
-          <h3>Instructions</h3>
+          <h3 class="panel-heading" data-kanji="手順">Instructions</h3>
           <ol id="instructions-list"></ol>
         </section>
       </aside>
@@ -139,6 +147,20 @@
           <iframe id="pdf-preview-frame" title="Aperçu du PDF"></iframe>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div id="settings-modal" hidden>
+    <div id="settings-modal-box">
+      <h3>Réglages</h3>
+      <p>Thème :</p>
+      <div id="theme-picker">
+        <button type="button" class="theme-option" data-theme="graphite">Minimaliste</button>
+        <button type="button" class="theme-option" data-theme="granny">Crochet</button>
+        <button type="button" class="theme-option" data-theme="lightstick">K-pop</button>
+        <button type="button" class="theme-option" data-theme="washi">Japon</button>
+      </div>
+      <button id="settings-close">Fermer</button>
     </div>
   </div>
 
