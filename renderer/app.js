@@ -350,9 +350,8 @@ document.getElementById('export-png-btn').addEventListener('click', async () => 
 const pdfExportModal = document.getElementById('pdf-export-modal');
 
 document.getElementById('export-pdf-btn').addEventListener('click', () => {
-  document.getElementById('pdf-preview-frame').src = '';
-  document.getElementById('pdf-preview-error').hidden = true;
   pdfExportModal.hidden = false;
+  refreshPdfPreview();
 });
 
 document.getElementById('pdf-export-cancel').addEventListener('click', () => {
@@ -363,10 +362,11 @@ document.querySelectorAll('.pdf-orientation-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.pdf-orientation-btn').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
+    refreshPdfPreview();
   });
 });
 
-function buildPdfExportPayload() {
+function readPdfExportOptions() {
   const orientation = document.querySelector('.pdf-orientation-btn.active').dataset.orientation;
   const paperSize = document.getElementById('pdf-paper-size').value;
   const marginValue = parseFloat(document.getElementById('pdf-margin-mm').value);
@@ -375,8 +375,7 @@ function buildPdfExportPayload() {
   const includeLegend = document.getElementById('pdf-include-legend').checked;
 
   if (!Number.isFinite(marginValue) || marginValue < 0) {
-    alert('La marge doit être un nombre positif.');
-    return null;
+    return { error: 'La marge doit être un nombre positif.' };
   }
 
   const project = {
@@ -391,15 +390,20 @@ function buildPdfExportPayload() {
   const chart = getCurrentChart();
 
   return {
-    chart,
-    instructions,
-    options: { orientation, paperSize, marginValue, marginUnit, instructionsPosition, includeLegend },
+    payload: {
+      chart,
+      instructions,
+      options: { orientation, paperSize, marginValue, marginUnit, instructionsPosition, includeLegend },
+    },
   };
 }
 
 document.getElementById('pdf-export-confirm').addEventListener('click', async () => {
-  const payload = buildPdfExportPayload();
-  if (!payload) return;
+  const { payload, error } = readPdfExportOptions();
+  if (error) {
+    alert(error);
+    return;
+  }
 
   const result = await window.api.exportPdf(payload);
 
@@ -410,14 +414,23 @@ document.getElementById('pdf-export-confirm').addEventListener('click', async ()
   }
 });
 
-document.getElementById('pdf-preview-btn').addEventListener('click', async () => {
-  const payload = buildPdfExportPayload();
-  if (!payload) return;
+let pdfPreviewRequestId = 0;
 
+async function refreshPdfPreview() {
+  const requestId = ++pdfPreviewRequestId;
   const previewError = document.getElementById('pdf-preview-error');
   const previewFrame = document.getElementById('pdf-preview-frame');
+  const { payload, error } = readPdfExportOptions();
+
+  if (error) {
+    previewFrame.src = '';
+    previewError.textContent = error;
+    previewError.hidden = false;
+    return;
+  }
 
   const result = await window.api.previewPdf(payload);
+  if (requestId !== pdfPreviewRequestId) return; // a newer change superseded this request
 
   if (result.success) {
     previewError.hidden = true;
@@ -427,7 +440,19 @@ document.getElementById('pdf-preview-btn').addEventListener('click', async () =>
     previewError.textContent = `Aperçu indisponible : ${result.error}`;
     previewError.hidden = false;
   }
-});
+}
+
+let pdfPreviewDebounceTimer = null;
+function schedulePdfPreviewRefresh() {
+  clearTimeout(pdfPreviewDebounceTimer);
+  pdfPreviewDebounceTimer = setTimeout(refreshPdfPreview, 400);
+}
+
+document.getElementById('pdf-paper-size').addEventListener('change', refreshPdfPreview);
+document.getElementById('pdf-margin-mm').addEventListener('input', schedulePdfPreviewRefresh);
+document.getElementById('pdf-margin-unit').addEventListener('change', refreshPdfPreview);
+document.getElementById('pdf-instructions-position').addEventListener('change', refreshPdfPreview);
+document.getElementById('pdf-include-legend').addEventListener('change', refreshPdfPreview);
 
 function getCurrentChart() {
   return {
