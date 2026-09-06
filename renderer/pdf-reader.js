@@ -75,9 +75,11 @@ function createPdfReader({ canvas, pageLabelEl, thumbRailEl, prevBtn, nextBtn, z
     }
   }
 
-  async function load(filePath) {
+  async function load() {
     const pdfjsLib = await loadPdfjs();
-    const bytesResult = await window.api.readPdfBytes(filePath);
+    // No path is passed here: the main process only ever reads back its own
+    // fixed, known preview file — see fs:read-pdf-bytes in main.js.
+    const bytesResult = await window.api.readPdfBytes();
     if (!bytesResult.success) {
       throw new Error(bytesResult.error);
     }

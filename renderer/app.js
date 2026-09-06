@@ -513,7 +513,7 @@ async function refreshPdfPreview() {
 
   if (result.success) {
     try {
-      await pdfReader.load(result.path);
+      await pdfReader.load();
       if (requestId !== pdfPreviewRequestId) return;
       previewError.hidden = true;
     } catch (err) {

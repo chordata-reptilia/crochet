@@ -6,7 +6,7 @@ contextBridge.exposeInMainWorld('api', {
   exportPng: (dataUrl) => ipcRenderer.invoke('export:png', dataUrl),
   exportPdf: (payload) => ipcRenderer.invoke('export:pdf', payload),
   previewPdf: (payload) => ipcRenderer.invoke('export:pdf-preview', payload),
-  readPdfBytes: (filePath) => ipcRenderer.invoke('fs:read-pdf-bytes', filePath),
+  readPdfBytes: () => ipcRenderer.invoke('fs:read-pdf-bytes'),
   exportLegendPdf: (payload) => ipcRenderer.invoke('export:legend-pdf', payload),
   exportLegendPng: (dataUrl) => ipcRenderer.invoke('export:legend-png', dataUrl),
 });

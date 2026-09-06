@@ -116,27 +116,29 @@ ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) =>
   }
 });
 
+const PREVIEW_PDF_PATH = path.join(app.getPath('temp'), 'crochet-pattern-designer-preview.pdf');
+
 ipcMain.handle('export:pdf-preview', async (_event, { chart, instructions, options }) => {
   const validationError = validatePdfOptions(options);
   if (validationError) {
     return { success: false, error: validationError };
   }
 
-  const previewPath = path.join(app.getPath('temp'), 'crochet-pattern-designer-preview.pdf');
   try {
-    await buildPdf({ chart, instructions, options, outputPath: previewPath });
-    return { success: true, path: previewPath };
+    await buildPdf({ chart, instructions, options, outputPath: PREVIEW_PDF_PATH });
+    return { success: true, path: PREVIEW_PDF_PATH };
   } catch (err) {
     return { success: false, error: err.message };
   }
 });
 
-// Reads back a file the renderer already asked us to export/preview (the
-// native in-app PDF reader needs the raw bytes, not just the path, since it
-// renders pages itself via pdfjs-dist instead of embedding a browser viewer).
-ipcMain.handle('fs:read-pdf-bytes', async (_event, filePath) => {
+// Reads back the preview file so the native in-app PDF reader (pdfjs-dist)
+// can get the raw bytes it needs to render pages itself. Deliberately ignores
+// any path the renderer might pass in and only ever reads this fixed,
+// main-process-owned path — never an arbitrary renderer-supplied file path.
+ipcMain.handle('fs:read-pdf-bytes', async () => {
   try {
-    const buffer = await fs.readFile(filePath);
+    const buffer = await fs.readFile(PREVIEW_PDF_PATH);
     return { success: true, data: buffer.toString('base64') };
   } catch (err) {
     return { success: false, error: err.message };
