@@ -40,3 +40,8 @@ test('a legend with zero used colors still produces a valid one-page PDF', async
   expect(countPdfPages(outputPath)).toBe(1);
   fs.unlinkSync(outputPath);
 });
+
+test('buildLegendDocument rejects on stream error when output path is invalid', async () => {
+  const outputPath = path.join(os.tmpdir(), `nonexistent-dir-${Date.now()}`, 'legend.pdf');
+  await expect(buildLegendDocument({ chart: makeChart(3), outputPath })).rejects.toThrow();
+});
