@@ -433,7 +433,6 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
    ============================================================ */
 #new-project-modal,
 #resize-project-modal,
-#pdf-export-modal,
 #settings-modal {
   position: fixed;
   inset: 0;
@@ -444,12 +443,27 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
 }
 #new-project-modal:not([hidden]),
 #resize-project-modal:not([hidden]),
-#pdf-export-modal:not([hidden]),
 #settings-modal:not([hidden]) { display: flex; }
+
+/* PDF export — a full dedicated page (replaces the editor entirely while
+   open), not a small centered dialog: no dark backdrop, no max-width. */
+#pdf-export-modal {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+#pdf-export-modal:not([hidden]) { display: flex; }
+#pdf-export-modal-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px;
+}
 
 #new-project-modal-box,
 #resize-project-modal-box,
-#pdf-export-modal-box,
 #settings-modal-box {
   background: var(--panel-bg);
   color: var(--text);
@@ -461,8 +475,23 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
 }
 #new-project-modal-box h3,
 #resize-project-modal-box h3,
-#pdf-export-modal-box h3,
 #settings-modal-box h3 {
+  font-family: var(--font-heading);
+  color: var(--text-strong);
+  text-transform: var(--heading-transform);
+  letter-spacing: var(--heading-tracking);
+}
+.pdf-export-page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: var(--border-width) solid var(--border);
+}
+.pdf-export-page-header h2 {
+  margin: 0;
   font-family: var(--font-heading);
   color: var(--text-strong);
   text-transform: var(--heading-transform);
@@ -491,14 +520,9 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   cursor: pointer;
 }
 
-#pdf-export-modal-box {
-  max-width: 90vw;
-  max-height: 90vh;
-  overflow: auto;
-}
-.pdf-export-modal-layout { display: flex; gap: 20px; }
-.pdf-export-modal-controls { flex: 0 0 280px; }
-.pdf-export-modal-preview { flex: 1 1 420px; min-width: 320px; display: flex; flex-direction: column; }
+.pdf-export-modal-layout { display: flex; gap: 20px; flex: 1; min-height: 0; }
+.pdf-export-modal-controls { flex: 0 0 320px; overflow-y: auto; }
+.pdf-export-modal-preview { flex: 1; min-width: 320px; display: flex; flex-direction: column; }
 .pdf-preview-toolbar { display: flex; justify-content: flex-end; margin-bottom: 6px; }
 #pdf-preview-frame { flex: 1; width: 100%; min-height: 480px; border: var(--border-width) solid var(--border); }
 #pdf-preview-frame:fullscreen { border: none; width: 100vw; height: 100vh; background: #FFFFFF; }

@@ -106,9 +106,12 @@
 
   <div id="pdf-export-modal" hidden>
     <div id="pdf-export-modal-box">
+      <div class="pdf-export-page-header">
+        <button type="button" id="pdf-export-cancel">← Retour</button>
+        <h2>Exporter en PDF</h2>
+      </div>
       <div class="pdf-export-modal-layout">
         <div class="pdf-export-modal-controls">
-          <h3>Exporter en PDF</h3>
           <label>Orientation :<br />
             <div class="pdf-orientation-buttons">
               <button type="button" id="pdf-orientation-portrait" class="pdf-orientation-btn active" data-orientation="portrait">Portrait</button>
@@ -158,7 +161,6 @@
             </select>
           </div>
           <button id="pdf-export-confirm">Exporter</button>
-          <button id="pdf-export-cancel">Annuler</button>
         </div>
         <div class="pdf-export-modal-preview">
           <div class="pdf-preview-toolbar">
