@@ -69,57 +69,66 @@
 
   <div id="pdf-export-modal" hidden>
     <div id="pdf-export-modal-box">
-      <h3>Exporter en PDF</h3>
-      <label>Orientation :<br />
-        <div class="pdf-orientation-buttons">
-          <button type="button" id="pdf-orientation-portrait" class="pdf-orientation-btn active" data-orientation="portrait">Portrait</button>
-          <button type="button" id="pdf-orientation-landscape" class="pdf-orientation-btn" data-orientation="landscape">Paysage</button>
+      <div class="pdf-export-modal-layout">
+        <div class="pdf-export-modal-controls">
+          <h3>Exporter en PDF</h3>
+          <label>Orientation :<br />
+            <div class="pdf-orientation-buttons">
+              <button type="button" id="pdf-orientation-portrait" class="pdf-orientation-btn active" data-orientation="portrait">Portrait</button>
+              <button type="button" id="pdf-orientation-landscape" class="pdf-orientation-btn" data-orientation="landscape">Paysage</button>
+            </div>
+          </label><br />
+          <label>Format papier :<br />
+            <select id="pdf-paper-size">
+              <option value="A0">A0</option>
+              <option value="A1">A1</option>
+              <option value="A2">A2</option>
+              <option value="A3">A3</option>
+              <option value="A4" selected>A4</option>
+              <option value="A5">A5</option>
+              <option value="A6">A6</option>
+              <option value="Legal">Legal</option>
+              <option value="Ledger">Ledger</option>
+              <option value="Letter">Letter</option>
+            </select>
+          </label><br />
+          <label>Marge :<br />
+            <div class="pdf-margin-row">
+              <input type="number" id="pdf-margin-mm" value="10" min="0" />
+              <select id="pdf-margin-unit">
+                <option value="mm" selected>mm</option>
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+              </select>
+            </div>
+          </label><br />
+          <label>Instructions :<br />
+            <select id="pdf-instructions-position">
+              <option value="before">Avant la grille</option>
+              <option value="after" selected>Après la grille</option>
+              <option value="none">Aucune</option>
+            </select>
+          </label><br />
+          <label class="pdf-legend-checkbox-label">
+            <input type="checkbox" id="pdf-include-legend" />
+            Inclure la légende
+          </label><br />
+          <div class="pdf-legend-download-row">
+            <button type="button" id="pdf-legend-download-btn">Télécharger la légende séparément…</button>
+            <select id="pdf-legend-format">
+              <option value="pdf" selected>PDF</option>
+              <option value="png">PNG</option>
+            </select>
+          </div>
+          <button type="button" id="pdf-preview-btn">Aperçu</button>
+          <button id="pdf-export-confirm">Exporter</button>
+          <button id="pdf-export-cancel">Annuler</button>
         </div>
-      </label><br />
-      <label>Format papier :<br />
-        <select id="pdf-paper-size">
-          <option value="A0">A0</option>
-          <option value="A1">A1</option>
-          <option value="A2">A2</option>
-          <option value="A3">A3</option>
-          <option value="A4" selected>A4</option>
-          <option value="A5">A5</option>
-          <option value="A6">A6</option>
-          <option value="Legal">Legal</option>
-          <option value="Ledger">Ledger</option>
-          <option value="Letter">Letter</option>
-        </select>
-      </label><br />
-      <label>Marge :<br />
-        <div class="pdf-margin-row">
-          <input type="number" id="pdf-margin-mm" value="10" min="0" />
-          <select id="pdf-margin-unit">
-            <option value="mm" selected>mm</option>
-            <option value="cm">cm</option>
-            <option value="in">in</option>
-          </select>
+        <div class="pdf-export-modal-preview">
+          <div id="pdf-preview-error" class="pdf-preview-error" hidden></div>
+          <iframe id="pdf-preview-frame" title="Aperçu du PDF"></iframe>
         </div>
-      </label><br />
-      <label>Instructions :<br />
-        <select id="pdf-instructions-position">
-          <option value="before">Avant la grille</option>
-          <option value="after" selected>Après la grille</option>
-          <option value="none">Aucune</option>
-        </select>
-      </label><br />
-      <label class="pdf-legend-checkbox-label">
-        <input type="checkbox" id="pdf-include-legend" />
-        Inclure la légende
-      </label><br />
-      <div class="pdf-legend-download-row">
-        <button type="button" id="pdf-legend-download-btn">Télécharger la légende séparément…</button>
-        <select id="pdf-legend-format">
-          <option value="pdf" selected>PDF</option>
-          <option value="png">PNG</option>
-        </select>
       </div>
-      <button id="pdf-export-confirm">Exporter</button>
-      <button id="pdf-export-cancel">Annuler</button>
     </div>
   </div>
 

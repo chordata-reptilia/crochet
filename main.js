@@ -14,6 +14,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      plugins: true,
     },
   });
 
@@ -72,27 +73,35 @@ const VALID_ORIENTATIONS = ['portrait', 'landscape'];
 const VALID_INSTRUCTIONS_POSITIONS = ['before', 'after', 'none'];
 const VALID_MARGIN_UNITS = ['mm', 'cm', 'in'];
 
-ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) => {
+function validatePdfOptions(options) {
   if (!options || typeof options !== 'object') {
-    return { success: false, error: 'Les options d\'export sont requises.' };
+    return 'Les options d\'export sont requises.';
   }
   if (!VALID_PAPER_SIZES.includes(options.paperSize)) {
-    return { success: false, error: `Format papier invalide : ${options.paperSize}` };
+    return `Format papier invalide : ${options.paperSize}`;
   }
   if (!VALID_ORIENTATIONS.includes(options.orientation)) {
-    return { success: false, error: `Orientation invalide : ${options.orientation}` };
+    return `Orientation invalide : ${options.orientation}`;
   }
   if (!VALID_INSTRUCTIONS_POSITIONS.includes(options.instructionsPosition)) {
-    return { success: false, error: `Position des instructions invalide : ${options.instructionsPosition}` };
+    return `Position des instructions invalide : ${options.instructionsPosition}`;
   }
   if (!VALID_MARGIN_UNITS.includes(options.marginUnit)) {
-    return { success: false, error: `Unité de marge invalide : ${options.marginUnit}` };
+    return `Unité de marge invalide : ${options.marginUnit}`;
   }
   if (typeof options.marginValue !== 'number' || !Number.isFinite(options.marginValue) || options.marginValue < 0) {
-    return { success: false, error: 'La marge doit être un nombre positif.' };
+    return 'La marge doit être un nombre positif.';
   }
   if (typeof options.includeLegend !== 'boolean') {
-    return { success: false, error: 'L\'option "Inclure la légende" doit être un booléen.' };
+    return 'L\'option "Inclure la légende" doit être un booléen.';
+  }
+  return null;
+}
+
+ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) => {
+  const validationError = validatePdfOptions(options);
+  if (validationError) {
+    return { success: false, error: validationError };
   }
 
   const result = await dialog.showSaveDialog(mainWindow, {
@@ -103,6 +112,21 @@ ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) =>
   try {
     await buildPdf({ chart, instructions, options, outputPath: result.filePath });
     return { success: true, path: result.filePath };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('export:pdf-preview', async (_event, { chart, instructions, options }) => {
+  const validationError = validatePdfOptions(options);
+  if (validationError) {
+    return { success: false, error: validationError };
+  }
+
+  const previewPath = path.join(app.getPath('temp'), 'crochet-pattern-designer-preview.pdf');
+  try {
+    await buildPdf({ chart, instructions, options, outputPath: previewPath });
+    return { success: true, path: previewPath };
   } catch (err) {
     return { success: false, error: err.message };
   }

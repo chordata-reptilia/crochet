@@ -350,6 +350,8 @@ document.getElementById('export-png-btn').addEventListener('click', async () => 
 const pdfExportModal = document.getElementById('pdf-export-modal');
 
 document.getElementById('export-pdf-btn').addEventListener('click', () => {
+  document.getElementById('pdf-preview-frame').src = '';
+  document.getElementById('pdf-preview-error').hidden = true;
   pdfExportModal.hidden = false;
 });
 
@@ -364,7 +366,7 @@ document.querySelectorAll('.pdf-orientation-btn').forEach((btn) => {
   });
 });
 
-document.getElementById('pdf-export-confirm').addEventListener('click', async () => {
+function buildPdfExportPayload() {
   const orientation = document.querySelector('.pdf-orientation-btn.active').dataset.orientation;
   const paperSize = document.getElementById('pdf-paper-size').value;
   const marginValue = parseFloat(document.getElementById('pdf-margin-mm').value);
@@ -374,7 +376,7 @@ document.getElementById('pdf-export-confirm').addEventListener('click', async ()
 
   if (!Number.isFinite(marginValue) || marginValue < 0) {
     alert('La marge doit être un nombre positif.');
-    return;
+    return null;
   }
 
   const project = {
@@ -386,19 +388,44 @@ document.getElementById('pdf-export-confirm').addEventListener('click', async ()
     cells: AppState.grid.cells,
   };
   const instructions = instructionsPosition === 'none' ? [] : generateInstructions(project);
-
   const chart = getCurrentChart();
 
-  const result = await window.api.exportPdf({
+  return {
     chart,
     instructions,
     options: { orientation, paperSize, marginValue, marginUnit, instructionsPosition, includeLegend },
-  });
+  };
+}
+
+document.getElementById('pdf-export-confirm').addEventListener('click', async () => {
+  const payload = buildPdfExportPayload();
+  if (!payload) return;
+
+  const result = await window.api.exportPdf(payload);
 
   if (result.success) {
     pdfExportModal.hidden = true;
   } else if (!result.canceled) {
     alert(`Erreur lors de l'export PDF : ${result.error}`);
+  }
+});
+
+document.getElementById('pdf-preview-btn').addEventListener('click', async () => {
+  const payload = buildPdfExportPayload();
+  if (!payload) return;
+
+  const previewError = document.getElementById('pdf-preview-error');
+  const previewFrame = document.getElementById('pdf-preview-frame');
+
+  const result = await window.api.previewPdf(payload);
+
+  if (result.success) {
+    previewError.hidden = true;
+    previewFrame.src = `file://${result.path}?t=${Date.now()}`;
+  } else {
+    previewFrame.src = '';
+    previewError.textContent = `Aperçu indisponible : ${result.error}`;
+    previewError.hidden = false;
   }
 });
 

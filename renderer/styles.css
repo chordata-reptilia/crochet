@@ -55,7 +55,15 @@ body { margin: 0; font-family: sans-serif; }
   padding: 20px;
   border-radius: 6px;
   min-width: 280px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
 }
+.pdf-export-modal-layout { display: flex; gap: 20px; }
+.pdf-export-modal-controls { flex: 0 0 280px; }
+.pdf-export-modal-preview { flex: 1 1 420px; min-width: 320px; display: flex; flex-direction: column; }
+#pdf-preview-frame { flex: 1; width: 100%; min-height: 480px; border: 1px solid #ccc; }
+.pdf-preview-error { color: #a00; font-size: 13px; margin-bottom: 8px; }
 #pdf-export-modal-box label { display: block; margin-bottom: 8px; }
 #pdf-export-modal-box select, #pdf-export-modal-box input { width: 100%; box-sizing: border-box; }
 .pdf-orientation-buttons { display: flex; gap: 4px; }
