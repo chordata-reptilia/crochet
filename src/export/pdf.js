@@ -3,6 +3,7 @@ const PDFDocument = require('pdfkit');
 const { computePageLayout } = require('./page-layout');
 const { buildLegendRows } = require('../legend');
 const { drawLegendSection } = require('./legend');
+const { getPdfTheme } = require('./pdf-theme');
 
 function cellColorHex(chart, colorId) {
   if (!colorId) return '#ffffff';
@@ -27,6 +28,8 @@ function buildPdf({ chart, instructions, options, outputPath }) {
       return;
     }
 
+    const pdfTheme = getPdfTheme(options.theme);
+
     const pageSize = [layout.pageWidthPt, layout.pageHeightPt];
     const margins = {
       top: layout.marginPt,
@@ -45,13 +48,14 @@ function buildPdf({ chart, instructions, options, outputPath }) {
         doc.addPage({ size: pageSize, margins });
       }
       firstPageUsed = true;
+      doc.rect(0, 0, layout.pageWidthPt, layout.pageHeightPt).fill(pdfTheme.pageBg);
     }
 
     function writeInstructions() {
       ensureFreshPage();
-      doc.fillColor('#000000').fontSize(14).text('Instructions', { underline: true });
+      doc.font(pdfTheme.headingFont).fillColor(pdfTheme.accent).fontSize(14).text('Instructions', { underline: true });
       doc.moveDown(0.5);
-      doc.fontSize(11);
+      doc.font(pdfTheme.bodyFont).fillColor(pdfTheme.text).fontSize(11);
       instructions.forEach((line) => doc.text(line));
     }
 
@@ -82,14 +86,15 @@ function buildPdf({ chart, instructions, options, outputPath }) {
                 layout.cellPt,
                 layout.cellPt
               )
-              .fillAndStroke(hex, '#dddddd');
+              .fillAndStroke(hex, pdfTheme.gridLine);
           }
         }
 
         if (totalGridPages > 1) {
           doc
+            .font(pdfTheme.bodyFont)
             .fontSize(9)
-            .fillColor('#000000')
+            .fillColor(pdfTheme.text)
             .text(`Page ${gridPageNum}/${totalGridPages}`, 0, layout.pageHeightPt - layout.marginPt - 14, {
               width: layout.pageWidthPt,
               align: 'center',
@@ -104,6 +109,7 @@ function buildPdf({ chart, instructions, options, outputPath }) {
         pageHeightPt: layout.pageHeightPt,
         marginPt: layout.marginPt,
         ensureFreshPage,
+        theme: options.theme,
       });
     }
 

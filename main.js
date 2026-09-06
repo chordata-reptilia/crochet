@@ -139,7 +139,7 @@ function isValidChart(chart) {
     && Array.isArray(chart.palette);
 }
 
-ipcMain.handle('export:legend-pdf', async (_event, chart) => {
+ipcMain.handle('export:legend-pdf', async (_event, { chart, theme } = {}) => {
   if (!isValidChart(chart)) {
     return { success: false, error: 'La grille fournie est invalide.' };
   }
@@ -150,7 +150,7 @@ ipcMain.handle('export:legend-pdf', async (_event, chart) => {
   });
   if (result.canceled || !result.filePath) return { success: false, canceled: true };
   try {
-    await buildLegendDocument({ chart, outputPath: result.filePath });
+    await buildLegendDocument({ chart, outputPath: result.filePath, theme });
     return { success: true, path: result.filePath };
   } catch (err) {
     return { success: false, error: err.message };

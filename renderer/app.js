@@ -446,7 +446,7 @@ function readPdfExportOptions() {
     payload: {
       chart,
       instructions,
-      options: { orientation, paperSize, marginValue, marginUnit, instructionsPosition, includeLegend },
+      options: { orientation, paperSize, marginValue, marginUnit, instructionsPosition, includeLegend, theme: document.documentElement.dataset.theme },
     },
   };
 }
@@ -563,9 +563,10 @@ document.getElementById('pdf-legend-download-btn').addEventListener('click', asy
   }
 
   const format = document.getElementById('pdf-legend-format').value;
+  const theme = document.documentElement.dataset.theme;
   const result = format === 'png'
     ? await window.api.exportLegendPng(renderLegendCanvas(chart))
-    : await window.api.exportLegendPdf(chart);
+    : await window.api.exportLegendPdf({ chart, theme });
 
   if (!result.success && !result.canceled) {
     alert(`Erreur lors du téléchargement de la légende : ${result.error}`);
