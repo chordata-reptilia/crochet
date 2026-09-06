@@ -78,12 +78,27 @@
       </label><br />
       <label>Format papier :<br />
         <select id="pdf-paper-size">
-          <option value="A4">A4</option>
+          <option value="A0">A0</option>
+          <option value="A1">A1</option>
+          <option value="A2">A2</option>
+          <option value="A3">A3</option>
+          <option value="A4" selected>A4</option>
+          <option value="A5">A5</option>
+          <option value="A6">A6</option>
+          <option value="Legal">Legal</option>
+          <option value="Ledger">Ledger</option>
           <option value="Letter">Letter</option>
         </select>
       </label><br />
-      <label>Marge (mm) :<br />
-        <input type="number" id="pdf-margin-mm" value="10" min="0" />
+      <label>Marge :<br />
+        <div class="pdf-margin-row">
+          <input type="number" id="pdf-margin-mm" value="10" min="0" />
+          <select id="pdf-margin-unit">
+            <option value="mm" selected>mm</option>
+            <option value="cm">cm</option>
+            <option value="in">in</option>
+          </select>
+        </div>
       </label><br />
       <label>Instructions :<br />
         <select id="pdf-instructions-position">
@@ -92,6 +107,17 @@
           <option value="none">Aucune</option>
         </select>
       </label><br />
+      <label class="pdf-legend-checkbox-label">
+        <input type="checkbox" id="pdf-include-legend" />
+        Inclure la légende
+      </label><br />
+      <div class="pdf-legend-download-row">
+        <button type="button" id="pdf-legend-download-btn">Télécharger la légende séparément…</button>
+        <select id="pdf-legend-format">
+          <option value="pdf" selected>PDF</option>
+          <option value="png">PNG</option>
+        </select>
+      </div>
       <button id="pdf-export-confirm">Exporter</button>
       <button id="pdf-export-cancel">Annuler</button>
     </div>
@@ -101,6 +127,7 @@
   <script src="../src/palette.js"></script>
   <script src="../src/project.js"></script>
   <script src="../src/instructions.js"></script>
+  <script src="../src/legend.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -61,3 +61,10 @@ body { margin: 0; font-family: sans-serif; }
 .pdf-orientation-buttons { display: flex; gap: 4px; }
 .pdf-orientation-btn { flex: 1; }
 .pdf-orientation-btn.active { font-weight: bold; outline: 2px solid #333; }
+.pdf-margin-row { display: flex; gap: 4px; }
+.pdf-margin-row input, .pdf-margin-row select { flex: 1; width: auto; }
+#pdf-export-modal-box input[type="checkbox"] { width: auto; }
+.pdf-legend-checkbox-label { display: flex; align-items: center; gap: 6px; }
+.pdf-legend-download-row { display: flex; gap: 4px; margin: 8px 0; }
+.pdf-legend-download-row button { flex: 2; }
+.pdf-legend-download-row select { flex: 1; width: auto; }

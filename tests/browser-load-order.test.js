@@ -17,6 +17,7 @@ test('renderer script load order defines createProject/serializeProject/deserial
     '../src/palette.js',
     '../src/project.js',
     '../src/instructions.js',
+    '../src/legend.js',
   ];
 
   const context = {};
@@ -35,4 +36,5 @@ test('renderer script load order defines createProject/serializeProject/deserial
   expect(typeof context.deserializeProject).toBe('function');
   expect(typeof context.createGrid).toBe('function');
   expect(typeof context.createPalette).toBe('function');
+  expect(typeof context.buildLegendRows).toBe('function');
 });
