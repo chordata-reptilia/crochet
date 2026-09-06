@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs/promises');
 const { buildPdf } = require('./src/export/pdf');
+const { buildLegendDocument } = require('./src/export/legend');
 
 let mainWindow;
 
@@ -66,9 +67,10 @@ ipcMain.handle('export:png', async (_event, dataUrl) => {
   }
 });
 
-const VALID_PAPER_SIZES = ['A4', 'Letter'];
+const VALID_PAPER_SIZES = ['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'Legal', 'Ledger', 'Letter'];
 const VALID_ORIENTATIONS = ['portrait', 'landscape'];
 const VALID_INSTRUCTIONS_POSITIONS = ['before', 'after', 'none'];
+const VALID_MARGIN_UNITS = ['mm', 'cm', 'in'];
 
 ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) => {
   if (!options || typeof options !== 'object') {
@@ -83,8 +85,14 @@ ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) =>
   if (!VALID_INSTRUCTIONS_POSITIONS.includes(options.instructionsPosition)) {
     return { success: false, error: `Position des instructions invalide : ${options.instructionsPosition}` };
   }
-  if (typeof options.marginMm !== 'number' || !Number.isFinite(options.marginMm) || options.marginMm < 0) {
+  if (!VALID_MARGIN_UNITS.includes(options.marginUnit)) {
+    return { success: false, error: `Unité de marge invalide : ${options.marginUnit}` };
+  }
+  if (typeof options.marginValue !== 'number' || !Number.isFinite(options.marginValue) || options.marginValue < 0) {
     return { success: false, error: 'La marge doit être un nombre positif.' };
+  }
+  if (typeof options.includeLegend !== 'boolean') {
+    return { success: false, error: 'L\'option "Inclure la légende" doit être un booléen.' };
   }
 
   const result = await dialog.showSaveDialog(mainWindow, {
@@ -94,6 +102,35 @@ ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) =>
   if (result.canceled || !result.filePath) return { success: false, canceled: true };
   try {
     await buildPdf({ chart, instructions, options, outputPath: result.filePath });
+    return { success: true, path: result.filePath };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('export:legend-pdf', async (_event, chart) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    filters: [{ name: 'PDF', extensions: ['pdf'] }],
+    defaultPath: 'legende.pdf',
+  });
+  if (result.canceled || !result.filePath) return { success: false, canceled: true };
+  try {
+    await buildLegendDocument({ chart, outputPath: result.filePath });
+    return { success: true, path: result.filePath };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('export:legend-png', async (_event, dataUrl) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    filters: [{ name: 'Image PNG', extensions: ['png'] }],
+    defaultPath: 'legende.png',
+  });
+  if (result.canceled || !result.filePath) return { success: false, canceled: true };
+  try {
+    const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+    await fs.writeFile(result.filePath, Buffer.from(base64, 'base64'));
     return { success: true, path: result.filePath };
   } catch (err) {
     return { success: false, error: err.message };
