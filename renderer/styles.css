@@ -12,13 +12,23 @@ body { margin: 0; font-family: sans-serif; }
 .toolbar-sep { display: inline-block; width: 16px; }
 #workspace { cursor: crosshair; }
 
-.swatch-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; padding: 4px; border-radius: 4px; }
-.swatch-row.active { background: #eee; }
-.swatch { width: 20px; height: 20px; border: 1px solid #999; flex-shrink: 0; cursor: pointer; }
-.swatch-name { flex: 1; border: none; background: transparent; }
+#color-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.color-grid-swatch { width: 24px; height: 24px; border: 1px solid #999; border-radius: 3px; cursor: pointer; }
+.color-grid-swatch.active { outline: 2px solid #333; outline-offset: 1px; }
+#color-detail-row { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+#color-detail-name { flex: 1; }
 .swatch-remove { cursor: pointer; }
 
-#new-color-hex { width: 80px; margin-left: 4px; }
+#color-picker-panel { margin-bottom: 8px; }
+#color-picker-sv, #color-picker-hue { display: block; width: 100%; cursor: crosshair; border: 1px solid #999; touch-action: none; }
+#color-picker-sv { margin-bottom: 4px; }
+#color-picker-hue { margin-bottom: 6px; }
+#color-picker-shades { display: flex; gap: 3px; margin-bottom: 6px; }
+.color-picker-shade { flex: 1; height: 18px; border: 1px solid #999; cursor: pointer; }
+.color-picker-hex-row { display: flex; align-items: center; gap: 6px; }
+.color-picker-preview { width: 24px; height: 24px; border: 1px solid #999; flex-shrink: 0; border-radius: 3px; }
+.color-picker-hex-row input { flex: 1; }
+
 
 #new-project-modal {
   position: fixed;

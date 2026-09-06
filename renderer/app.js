@@ -172,66 +172,62 @@ window.addEventListener('keydown', (evt) => {
   }
 });
 
-const colorListEl = document.getElementById('color-list');
+const colorGridEl = document.getElementById('color-grid');
+const colorDetailRowEl = document.getElementById('color-detail-row');
+const colorDetailNameEl = document.getElementById('color-detail-name');
 
 function renderPalette() {
-  colorListEl.innerHTML = '';
+  colorGridEl.innerHTML = '';
   AppState.palette.forEach((color) => {
-    const row = document.createElement('div');
-    row.className = 'swatch-row' + (color.id === AppState.activeColorId ? ' active' : '');
-
     const swatch = document.createElement('div');
-    swatch.className = 'swatch';
+    swatch.className = 'color-grid-swatch' + (color.id === AppState.activeColorId ? ' active' : '');
     swatch.style.backgroundColor = color.hex;
+    swatch.title = color.name ? `${color.name} (${color.hex})` : color.hex;
     swatch.addEventListener('click', () => {
       AppState.activeColorId = color.id;
       renderPalette();
     });
-
-    const nameInput = document.createElement('input');
-    nameInput.className = 'swatch-name';
-    nameInput.value = color.name;
-    nameInput.addEventListener('change', () => {
-      AppState.palette = renameColor(AppState.palette, color.id, nameInput.value);
-      renderPalette();
-      renderInstructions();
-    });
-
-    const removeBtn = document.createElement('span');
-    removeBtn.className = 'swatch-remove';
-    removeBtn.textContent = '✕';
-    removeBtn.addEventListener('click', () => {
-      AppState.palette = removeColor(AppState.palette, color.id);
-      if (AppState.activeColorId === color.id) AppState.activeColorId = null;
-      renderPalette();
-      renderInstructions();
-    });
-
-    row.appendChild(swatch);
-    row.appendChild(nameInput);
-    row.appendChild(removeBtn);
-    colorListEl.appendChild(row);
+    colorGridEl.appendChild(swatch);
   });
+
+  const activeColor = findColor(AppState.palette, AppState.activeColorId);
+  if (activeColor) {
+    colorDetailRowEl.hidden = false;
+    colorDetailNameEl.value = activeColor.name;
+  } else {
+    colorDetailRowEl.hidden = true;
+  }
 }
 
-const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
+colorDetailNameEl.addEventListener('change', () => {
+  if (!AppState.activeColorId) return;
+  AppState.palette = renameColor(AppState.palette, AppState.activeColorId, colorDetailNameEl.value);
+  renderPalette();
+  renderInstructions();
+});
+
+document.getElementById('color-detail-remove').addEventListener('click', () => {
+  if (!AppState.activeColorId) return;
+  AppState.palette = removeColor(AppState.palette, AppState.activeColorId);
+  AppState.activeColorId = null;
+  renderPalette();
+  renderInstructions();
+});
+
+const colorPicker = createColorPicker({
+  svCanvas: document.getElementById('color-picker-sv'),
+  hueCanvas: document.getElementById('color-picker-hue'),
+  shadesRow: document.getElementById('color-picker-shades'),
+  hexInput: document.getElementById('new-color-hex'),
+  previewEl: document.getElementById('color-picker-preview'),
+  initialHex: '#ff0000',
+});
 
 document.getElementById('add-color-btn').addEventListener('click', () => {
-  const hexInput = document.getElementById('new-color-hex');
-  const typedHex = hexInput.value.trim();
-  let hex = document.getElementById('new-color-picker').value;
-
-  if (typedHex !== '') {
-    if (!HEX_COLOR_PATTERN.test(typedHex)) {
-      alert('Code hexadécimal invalide. Format attendu : #RRGGBB (ex. #87CEEB).');
-      return;
-    }
-    hex = typedHex;
-  }
+  const hex = colorPicker.getHex();
 
   AppState.palette = addColor(AppState.palette, hex, '');
   AppState.activeColorId = AppState.palette[AppState.palette.length - 1].id;
-  hexInput.value = '';
   renderPalette();
   renderInstructions();
 });

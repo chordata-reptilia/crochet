@@ -30,9 +30,20 @@
       <aside id="side-panel">
         <section id="palette-panel">
           <h3>Couleurs</h3>
-          <div id="color-list"></div>
-          <input type="color" id="new-color-picker" value="#ff0000" />
-          <input type="text" id="new-color-hex" placeholder="#RRGGBB" maxlength="7" />
+          <div id="color-grid"></div>
+          <div id="color-detail-row" hidden>
+            <input type="text" id="color-detail-name" placeholder="Nom" />
+            <span id="color-detail-remove" class="swatch-remove">✕</span>
+          </div>
+          <div id="color-picker-panel">
+            <canvas id="color-picker-sv" width="160" height="120"></canvas>
+            <canvas id="color-picker-hue" width="160" height="16"></canvas>
+            <div id="color-picker-shades"></div>
+            <div class="color-picker-hex-row">
+              <span id="color-picker-preview" class="color-picker-preview"></span>
+              <input type="text" id="new-color-hex" placeholder="#RRGGBB" maxlength="7" />
+            </div>
+          </div>
           <button id="add-color-btn">Ajouter</button>
         </section>
         <section id="mode-panel">
@@ -133,9 +144,11 @@
 
   <script src="../src/grid.js"></script>
   <script src="../src/palette.js"></script>
+  <script src="../src/color-convert.js"></script>
   <script src="../src/project.js"></script>
   <script src="../src/instructions.js"></script>
   <script src="../src/legend.js"></script>
+  <script src="color-picker.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
