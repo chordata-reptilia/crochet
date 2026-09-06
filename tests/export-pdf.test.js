@@ -2,12 +2,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { buildPdf } = require('../src/export/pdf');
-
-function countPdfPages(filePath) {
-  const bytes = fs.readFileSync(filePath);
-  const matches = bytes.toString('latin1').match(/\/Type\s*\/Page(?!s)/g);
-  return matches ? matches.length : 0;
-}
+const { countPdfPages } = require('./helpers/pdf');
 
 function makeChart(width, height) {
   const palette = [{ id: 'c1', name: 'Rouge', hex: '#ff0000' }];

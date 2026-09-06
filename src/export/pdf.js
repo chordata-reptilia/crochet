@@ -100,6 +100,7 @@ function buildPdf({ chart, instructions, options, outputPath }) {
 
     if (options.includeLegend) {
       drawLegendSection(doc, buildLegendRows(chart), {
+        pageWidthPt: layout.pageWidthPt,
         pageHeightPt: layout.pageHeightPt,
         marginPt: layout.marginPt,
         ensureFreshPage,

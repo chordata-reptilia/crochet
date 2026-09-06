@@ -2,12 +2,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { buildLegendDocument } = require('../src/export/legend');
-
-function countPdfPages(filePath) {
-  const bytes = fs.readFileSync(filePath);
-  const matches = bytes.toString('latin1').match(/\/Type\s*\/Page(?!s)/g);
-  return matches ? matches.length : 0;
-}
+const { countPdfPages } = require('./helpers/pdf');
 
 function makeChart(colorCount) {
   const palette = [];

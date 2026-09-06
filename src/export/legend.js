@@ -11,8 +11,10 @@ const LEGEND_PAGE_HEIGHT_PT = 841.89;
 const LEGEND_MARGIN_PT = 40;
 
 function drawLegendSection(doc, rows, pageCtx) {
-  const { pageHeightPt, marginPt, ensureFreshPage } = pageCtx;
+  const { pageWidthPt, pageHeightPt, marginPt, ensureFreshPage } = pageCtx;
   const maxY = pageHeightPt - marginPt;
+  const labelX = marginPt + SWATCH_SIZE_PT + 8;
+  const labelWidth = pageWidthPt - marginPt - labelX;
 
   function writeHeading(text) {
     doc.fillColor('#000000').fontSize(14).text(text, { underline: true });
@@ -30,7 +32,12 @@ function drawLegendSection(doc, rows, pageCtx) {
     }
     const rowTop = doc.y;
     doc.rect(marginPt, rowTop, SWATCH_SIZE_PT, SWATCH_SIZE_PT).fillAndStroke(row.hex, '#333333');
-    doc.fillColor('#000000').text(row.label, marginPt + SWATCH_SIZE_PT + 8, rowTop + 2);
+    doc.fillColor('#000000').text(row.label, labelX, rowTop + 2, {
+      width: labelWidth,
+      height: SWATCH_SIZE_PT,
+      lineBreak: false,
+      ellipsis: true,
+    });
     doc.y = rowTop + ROW_HEIGHT_PT;
   });
 }
@@ -57,11 +64,18 @@ function buildLegendDocument({ chart, outputPath }) {
       firstPageUsed = true;
     }
 
-    drawLegendSection(doc, buildLegendRows(chart), {
-      pageHeightPt: LEGEND_PAGE_HEIGHT_PT,
-      marginPt: LEGEND_MARGIN_PT,
-      ensureFreshPage,
-    });
+    try {
+      drawLegendSection(doc, buildLegendRows(chart), {
+        pageWidthPt: LEGEND_PAGE_WIDTH_PT,
+        pageHeightPt: LEGEND_PAGE_HEIGHT_PT,
+        marginPt: LEGEND_MARGIN_PT,
+        ensureFreshPage,
+      });
+    } catch (err) {
+      stream.destroy();
+      reject(err);
+      return;
+    }
 
     doc.end();
     stream.on('finish', resolve);

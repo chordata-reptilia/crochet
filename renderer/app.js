@@ -387,12 +387,7 @@ document.getElementById('pdf-export-confirm').addEventListener('click', async ()
   };
   const instructions = instructionsPosition === 'none' ? [] : generateInstructions(project);
 
-  const chart = {
-    width: AppState.grid.width,
-    height: AppState.grid.height,
-    cells: AppState.grid.cells,
-    palette: AppState.palette,
-  };
+  const chart = getCurrentChart();
 
   const result = await window.api.exportPdf({
     chart,
@@ -406,6 +401,15 @@ document.getElementById('pdf-export-confirm').addEventListener('click', async ()
     alert(`Erreur lors de l'export PDF : ${result.error}`);
   }
 });
+
+function getCurrentChart() {
+  return {
+    width: AppState.grid.width,
+    height: AppState.grid.height,
+    cells: AppState.grid.cells,
+    palette: AppState.palette,
+  };
+}
 
 function renderLegendCanvas(chart) {
   const rows = buildLegendRows(chart);
@@ -446,12 +450,7 @@ function renderLegendCanvas(chart) {
 }
 
 document.getElementById('pdf-legend-download-btn').addEventListener('click', async () => {
-  const chart = {
-    width: AppState.grid.width,
-    height: AppState.grid.height,
-    cells: AppState.grid.cells,
-    palette: AppState.palette,
-  };
+  const chart = getCurrentChart();
 
   if (buildLegendRows(chart).length === 0) {
     alert('Aucune couleur n\'est utilisée dans la grille : rien à mettre dans la légende.');

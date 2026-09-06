@@ -108,7 +108,18 @@ ipcMain.handle('export:pdf', async (_event, { chart, instructions, options }) =>
   }
 });
 
+function isValidChart(chart) {
+  return !!chart
+    && typeof chart === 'object'
+    && Array.isArray(chart.cells)
+    && Array.isArray(chart.palette);
+}
+
 ipcMain.handle('export:legend-pdf', async (_event, chart) => {
+  if (!isValidChart(chart)) {
+    return { success: false, error: 'La grille fournie est invalide.' };
+  }
+
   const result = await dialog.showSaveDialog(mainWindow, {
     filters: [{ name: 'PDF', extensions: ['pdf'] }],
     defaultPath: 'legende.pdf',
