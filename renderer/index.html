@@ -34,7 +34,13 @@
         <button id="tool-eyedropper" class="tool-btn" data-tool="eyedropper" title="Pipette (4)">Pipette</button>
       </aside>
       <main id="workspace">
-        <canvas id="grid-canvas"></canvas>
+        <div id="grid-wrap">
+          <button type="button" class="grid-add-btn grid-add-top" data-side="top" title="Ajouter une ligne en haut (clic=+1, Ctrl+clic=+10)">+</button>
+          <button type="button" class="grid-add-btn grid-add-bottom" data-side="bottom" title="Ajouter une ligne en bas (clic=+1, Ctrl+clic=+10)">+</button>
+          <button type="button" class="grid-add-btn grid-add-left" data-side="left" title="Ajouter une colonne à gauche (clic=+1, Ctrl+clic=+10)">+</button>
+          <button type="button" class="grid-add-btn grid-add-right" data-side="right" title="Ajouter une colonne à droite (clic=+1, Ctrl+clic=+10)">+</button>
+          <canvas id="grid-canvas"></canvas>
+        </div>
       </main>
       <aside id="side-panel">
         <section id="palette-panel">
@@ -155,8 +161,11 @@
           <button id="pdf-export-cancel">Annuler</button>
         </div>
         <div class="pdf-export-modal-preview">
+          <div class="pdf-preview-toolbar">
+            <button type="button" id="pdf-preview-fullscreen-btn">Plein écran</button>
+          </div>
           <div id="pdf-preview-error" class="pdf-preview-error" hidden></div>
-          <iframe id="pdf-preview-frame" title="Aperçu du PDF"></iframe>
+          <iframe id="pdf-preview-frame" title="Aperçu du PDF" allowfullscreen></iframe>
         </div>
       </div>
     </div>

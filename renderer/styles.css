@@ -271,7 +271,29 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
 }
 
 #workspace { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; cursor: crosshair; background: var(--bg); }
+#grid-wrap { position: relative; display: inline-block; margin: 28px; }
 #grid-canvas { image-rendering: pixelated; display: block; }
+
+.grid-add-btn {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  line-height: 20px;
+  padding: 0;
+  font-size: 14px;
+  font-family: var(--font-body);
+  background: var(--panel-bg);
+  color: var(--text-muted);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  z-index: 2;
+}
+.grid-add-btn:hover { color: var(--text-strong); border-color: var(--accent); }
+.grid-add-top { top: -11px; left: 50%; transform: translateX(-50%); }
+.grid-add-bottom { bottom: -11px; left: 50%; transform: translateX(-50%); }
+.grid-add-left { left: -11px; top: 50%; transform: translateY(-50%); }
+.grid-add-right { right: -11px; top: 50%; transform: translateY(-50%); }
 
 #side-panel {
   width: 300px;
@@ -471,7 +493,9 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
 .pdf-export-modal-layout { display: flex; gap: 20px; }
 .pdf-export-modal-controls { flex: 0 0 280px; }
 .pdf-export-modal-preview { flex: 1 1 420px; min-width: 320px; display: flex; flex-direction: column; }
+.pdf-preview-toolbar { display: flex; justify-content: flex-end; margin-bottom: 6px; }
 #pdf-preview-frame { flex: 1; width: 100%; min-height: 480px; border: var(--border-width) solid var(--border); }
+#pdf-preview-frame:fullscreen { border: none; width: 100vw; height: 100vh; background: #FFFFFF; }
 .pdf-preview-error { color: var(--accent); font-size: 13px; margin-bottom: 8px; }
 #pdf-export-modal-box label { display: block; margin-bottom: 8px; }
 #pdf-export-modal-box select, #pdf-export-modal-box input { width: 100%; box-sizing: border-box; }

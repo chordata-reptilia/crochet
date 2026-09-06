@@ -1,4 +1,4 @@
-const { createGrid, getCell, setCell, resizeGrid, floodFill } = require('../src/grid');
+const { createGrid, getCell, setCell, resizeGrid, floodFill, addRows, addColumns } = require('../src/grid');
 
 test('createGrid makes a width x height grid of null cells', () => {
   const grid = createGrid(3, 2);
@@ -33,6 +33,58 @@ test('resizeGrid shrinking truncates cells outside the new bounds', () => {
   const resized = resizeGrid(grid, 2, 2);
   expect(resized.cells.length).toBe(2);
   expect(resized.cells[0].length).toBe(2);
+});
+
+test('addRows("bottom") appends empty rows after the existing ones', () => {
+  let grid = createGrid(2, 2);
+  grid = setCell(grid, 0, 0, 'c1');
+  const grown = addRows(grid, 1, 'bottom');
+  expect(grown.width).toBe(2);
+  expect(grown.height).toBe(3);
+  expect(getCell(grown, 0, 0)).toBe('c1');
+  expect(getCell(grown, 0, 2)).toBeNull();
+});
+
+test('addRows("top") inserts empty rows before the existing ones and shifts content down', () => {
+  let grid = createGrid(2, 2);
+  grid = setCell(grid, 0, 0, 'c1');
+  const grown = addRows(grid, 1, 'top');
+  expect(grown.width).toBe(2);
+  expect(grown.height).toBe(3);
+  expect(getCell(grown, 0, 0)).toBeNull();
+  expect(getCell(grown, 0, 1)).toBe('c1');
+});
+
+test('addRows supports adding more than one row at once', () => {
+  const grid = createGrid(2, 2);
+  const grown = addRows(grid, 10, 'top');
+  expect(grown.height).toBe(12);
+});
+
+test('addColumns("right") appends empty columns after the existing ones', () => {
+  let grid = createGrid(2, 2);
+  grid = setCell(grid, 1, 0, 'c1');
+  const grown = addColumns(grid, 1, 'right');
+  expect(grown.width).toBe(3);
+  expect(grown.height).toBe(2);
+  expect(getCell(grown, 1, 0)).toBe('c1');
+  expect(getCell(grown, 2, 0)).toBeNull();
+});
+
+test('addColumns("left") inserts empty columns before the existing ones and shifts content right', () => {
+  let grid = createGrid(2, 2);
+  grid = setCell(grid, 0, 0, 'c1');
+  const grown = addColumns(grid, 1, 'left');
+  expect(grown.width).toBe(3);
+  expect(grown.height).toBe(2);
+  expect(getCell(grown, 0, 0)).toBeNull();
+  expect(getCell(grown, 1, 0)).toBe('c1');
+});
+
+test('addColumns does not mutate the original grid', () => {
+  const grid = createGrid(2, 2);
+  addColumns(grid, 1, 'left');
+  expect(grid.width).toBe(2);
 });
 
 test('floodFill replaces a contiguous region of the same color', () => {

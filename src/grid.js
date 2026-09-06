@@ -34,6 +34,20 @@ function resizeGrid(grid, newWidth, newHeight) {
   return { width: newWidth, height: newHeight, cells };
 }
 
+function addRows(grid, count, side) {
+  const newRows = Array.from({ length: count }, () => new Array(grid.width).fill(null));
+  const cells = side === 'top' ? [...newRows, ...cloneCells(grid.cells)] : [...cloneCells(grid.cells), ...newRows];
+  return { width: grid.width, height: grid.height + count, cells };
+}
+
+function addColumns(grid, count, side) {
+  const cells = cloneCells(grid.cells).map((row) => {
+    const newCells = new Array(count).fill(null);
+    return side === 'left' ? [...newCells, ...row] : [...row, ...newCells];
+  });
+  return { width: grid.width + count, height: grid.height, cells };
+}
+
 function floodFill(grid, startX, startY, colorId) {
   const targetColor = getCell(grid, startX, startY);
   if (targetColor === colorId) {
@@ -56,5 +70,5 @@ function floodFill(grid, startX, startY, colorId) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { createGrid, getCell, setCell, resizeGrid, floodFill };
+  module.exports = { createGrid, getCell, setCell, resizeGrid, addRows, addColumns, floodFill };
 }

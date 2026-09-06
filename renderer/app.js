@@ -362,6 +362,21 @@ document.getElementById('resize-project-confirm').addEventListener('click', () =
   renderInstructions();
 });
 
+document.querySelectorAll('.grid-add-btn').forEach((btn) => {
+  btn.addEventListener('click', (evt) => {
+    const count = evt.ctrlKey || evt.metaKey ? 10 : 1;
+    const side = btn.dataset.side;
+    pushHistory(AppState.grid);
+    if (side === 'top' || side === 'bottom') {
+      AppState.grid = addRows(AppState.grid, count, side);
+    } else {
+      AppState.grid = addColumns(AppState.grid, count, side);
+    }
+    renderGrid();
+    renderInstructions();
+  });
+});
+
 document.getElementById('save-project-btn').addEventListener('click', async () => {
   const project = {
     name: AppState.name,
@@ -494,6 +509,13 @@ async function refreshPdfPreview() {
     previewError.hidden = false;
   }
 }
+
+document.getElementById('pdf-preview-fullscreen-btn').addEventListener('click', () => {
+  const previewFrame = document.getElementById('pdf-preview-frame');
+  if (previewFrame.requestFullscreen) {
+    previewFrame.requestFullscreen();
+  }
+});
 
 let pdfPreviewDebounceTimer = null;
 function schedulePdfPreviewRefresh() {
