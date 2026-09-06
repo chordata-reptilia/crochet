@@ -50,3 +50,27 @@ test('a grid needing two page-columns produces two grid pages with no legend/ins
   expect(countPdfPages(outputPath)).toBe(2);
   fs.unlinkSync(outputPath);
 });
+
+test('legend appears after grid and before after-positioned instructions', async () => {
+  const outputPath = path.join(os.tmpdir(), `pdf-test-${Date.now()}-legend-and-after.pdf`);
+  await buildPdf({
+    chart: makeChart(20, 20),
+    instructions: ['Rang 1 : 20 mailles Rouge'],
+    options: { orientation: 'portrait', paperSize: 'A4', marginValue: 10, marginUnit: 'mm', instructionsPosition: 'after', includeLegend: true },
+    outputPath,
+  });
+  expect(countPdfPages(outputPath)).toBe(3);
+  fs.unlinkSync(outputPath);
+});
+
+test('legend appears after grid even with before-positioned instructions', async () => {
+  const outputPath = path.join(os.tmpdir(), `pdf-test-${Date.now()}-legend-and-before.pdf`);
+  await buildPdf({
+    chart: makeChart(20, 20),
+    instructions: ['Rang 1 : 20 mailles Rouge'],
+    options: { orientation: 'portrait', paperSize: 'A4', marginValue: 10, marginUnit: 'mm', instructionsPosition: 'before', includeLegend: true },
+    outputPath,
+  });
+  expect(countPdfPages(outputPath)).toBe(3);
+  fs.unlinkSync(outputPath);
+});
