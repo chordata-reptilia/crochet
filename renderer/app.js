@@ -367,10 +367,12 @@ document.querySelectorAll('.pdf-orientation-btn').forEach((btn) => {
 document.getElementById('pdf-export-confirm').addEventListener('click', async () => {
   const orientation = document.querySelector('.pdf-orientation-btn.active').dataset.orientation;
   const paperSize = document.getElementById('pdf-paper-size').value;
-  const marginMm = parseFloat(document.getElementById('pdf-margin-mm').value);
+  const marginValue = parseFloat(document.getElementById('pdf-margin-mm').value);
+  const marginUnit = document.getElementById('pdf-margin-unit').value;
   const instructionsPosition = document.getElementById('pdf-instructions-position').value;
+  const includeLegend = document.getElementById('pdf-include-legend').checked;
 
-  if (!Number.isFinite(marginMm) || marginMm < 0) {
+  if (!Number.isFinite(marginValue) || marginValue < 0) {
     alert('La marge doit être un nombre positif.');
     return;
   }
@@ -395,12 +397,73 @@ document.getElementById('pdf-export-confirm').addEventListener('click', async ()
   const result = await window.api.exportPdf({
     chart,
     instructions,
-    options: { orientation, paperSize, marginMm, instructionsPosition },
+    options: { orientation, paperSize, marginValue, marginUnit, instructionsPosition, includeLegend },
   });
 
   if (result.success) {
     pdfExportModal.hidden = true;
   } else if (!result.canceled) {
     alert(`Erreur lors de l'export PDF : ${result.error}`);
+  }
+});
+
+function renderLegendCanvas(chart) {
+  const rows = buildLegendRows(chart);
+  const swatchSize = 24;
+  const rowHeight = 32;
+  const padding = 16;
+  const fontSize = 16;
+
+  const legendCanvas = document.createElement('canvas');
+  const measureCtx = legendCanvas.getContext('2d');
+  measureCtx.font = `${fontSize}px sans-serif`;
+  let maxLabelWidth = 0;
+  rows.forEach((row) => {
+    const width = measureCtx.measureText(row.label).width;
+    if (width > maxLabelWidth) maxLabelWidth = width;
+  });
+
+  legendCanvas.width = Math.ceil(padding * 3 + swatchSize + maxLabelWidth);
+  legendCanvas.height = Math.ceil(padding * 2 + Math.max(rows.length, 1) * rowHeight);
+
+  const ctx = legendCanvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, legendCanvas.width, legendCanvas.height);
+  ctx.font = `${fontSize}px sans-serif`;
+  ctx.textBaseline = 'middle';
+
+  rows.forEach((row, index) => {
+    const y = padding + index * rowHeight;
+    ctx.fillStyle = row.hex;
+    ctx.fillRect(padding, y, swatchSize, swatchSize);
+    ctx.strokeStyle = '#333333';
+    ctx.strokeRect(padding, y, swatchSize, swatchSize);
+    ctx.fillStyle = '#000000';
+    ctx.fillText(row.label, padding * 2 + swatchSize, y + swatchSize / 2);
+  });
+
+  return legendCanvas.toDataURL('image/png');
+}
+
+document.getElementById('pdf-legend-download-btn').addEventListener('click', async () => {
+  const chart = {
+    width: AppState.grid.width,
+    height: AppState.grid.height,
+    cells: AppState.grid.cells,
+    palette: AppState.palette,
+  };
+
+  if (buildLegendRows(chart).length === 0) {
+    alert('Aucune couleur n\'est utilisée dans la grille : rien à mettre dans la légende.');
+    return;
+  }
+
+  const format = document.getElementById('pdf-legend-format').value;
+  const result = format === 'png'
+    ? await window.api.exportLegendPng(renderLegendCanvas(chart))
+    : await window.api.exportLegendPdf(chart);
+
+  if (!result.success && !result.canceled) {
+    alert(`Erreur lors du téléchargement de la légende : ${result.error}`);
   }
 });
