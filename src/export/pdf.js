@@ -51,6 +51,32 @@ function buildPdf({ chart, instructions, options, outputPath }) {
       doc.rect(0, 0, layout.pageWidthPt, layout.pageHeightPt).fill(pdfTheme.pageBg);
     }
 
+    function drawCoverPage() {
+      ensureFreshPage();
+      const title = options.name && options.name.trim() !== '' ? options.name.trim() : 'Motif crochet';
+      const usedColors = buildLegendRows(chart);
+
+      doc.font(pdfTheme.headingFont).fillColor(pdfTheme.accent).fontSize(28).text(title, { align: 'center' });
+      doc.moveDown(1);
+      doc.font(pdfTheme.bodyFont).fillColor(pdfTheme.text).fontSize(12).text(
+        `${chart.width} x ${chart.height} mailles  ·  ${usedColors.length} couleur${usedColors.length > 1 ? 's' : ''}`,
+        { align: 'center' }
+      );
+      doc.moveDown(1.5);
+
+      if (usedColors.length > 0) {
+        const swatchSize = 18;
+        const gap = 6;
+        const maxSwatches = Math.min(usedColors.length, 24);
+        const totalWidth = maxSwatches * (swatchSize + gap) - gap;
+        const startX = (layout.pageWidthPt - totalWidth) / 2;
+        const y = doc.y;
+        usedColors.slice(0, maxSwatches).forEach((row, i) => {
+          doc.rect(startX + i * (swatchSize + gap), y, swatchSize, swatchSize).fillAndStroke(row.hex, pdfTheme.gridLine);
+        });
+      }
+    }
+
     function writeInstructions() {
       ensureFreshPage();
       doc.font(pdfTheme.headingFont).fillColor(pdfTheme.accent).fontSize(14).text('Instructions', { underline: true });
@@ -58,6 +84,8 @@ function buildPdf({ chart, instructions, options, outputPath }) {
       doc.font(pdfTheme.bodyFont).fillColor(pdfTheme.text).fontSize(11);
       instructions.forEach((line) => doc.text(line));
     }
+
+    drawCoverPage();
 
     if (options.instructionsPosition === 'before') {
       writeInstructions();

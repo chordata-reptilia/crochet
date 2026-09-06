@@ -270,8 +270,14 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
   box-shadow: var(--glow);
 }
 
-#workspace { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; cursor: crosshair; background: var(--bg); }
-#grid-wrap { position: relative; display: inline-block; margin: 28px; }
+/* No align-items/justify-content:center here on purpose — combined with
+   overflow:auto, that centering trick makes the browser refuse to scroll
+   back past the container's natural center once the content (post-zoom or
+   after growing the grid) overflows, so the top/left portion becomes
+   unreachable. margin:auto on #grid-wrap below gives the same centering
+   when the content fits, without breaking scroll when it doesn't. */
+#workspace { flex: 1; display: flex; overflow: auto; cursor: crosshair; background: var(--bg); padding: 28px; }
+#grid-wrap { position: relative; display: inline-block; margin: auto; }
 #grid-canvas { image-rendering: pixelated; display: block; }
 
 .grid-add-btn {

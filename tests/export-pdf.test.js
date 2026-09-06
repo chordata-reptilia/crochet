@@ -10,7 +10,7 @@ function makeChart(width, height) {
   return { width, height, cells, palette };
 }
 
-test('a grid that fits one page produces one grid page plus one instructions page', async () => {
+test('a grid that fits one page produces a cover, one grid page, and one instructions page', async () => {
   const outputPath = path.join(os.tmpdir(), `pdf-test-${Date.now()}-single.pdf`);
   await buildPdf({
     chart: makeChart(20, 20),
@@ -18,7 +18,7 @@ test('a grid that fits one page produces one grid page plus one instructions pag
     options: { orientation: 'portrait', paperSize: 'A4', marginValue: 10, marginUnit: 'mm', instructionsPosition: 'after', includeLegend: false },
     outputPath,
   });
-  expect(countPdfPages(outputPath)).toBe(2);
+  expect(countPdfPages(outputPath)).toBe(3);
   fs.unlinkSync(outputPath);
 });
 
@@ -30,11 +30,11 @@ test('including the legend adds exactly one extra page for a small palette', asy
     options: { orientation: 'portrait', paperSize: 'A4', marginValue: 10, marginUnit: 'mm', instructionsPosition: 'none', includeLegend: true },
     outputPath,
   });
-  expect(countPdfPages(outputPath)).toBe(2);
+  expect(countPdfPages(outputPath)).toBe(3);
   fs.unlinkSync(outputPath);
 });
 
-test('a grid needing two page-columns produces two grid pages with no legend/instructions', async () => {
+test('a grid needing two page-columns produces a cover plus two grid pages with no legend/instructions', async () => {
   const outputPath = path.join(os.tmpdir(), `pdf-test-${Date.now()}-multipage.pdf`);
   await buildPdf({
     chart: makeChart(50, 20),
@@ -42,7 +42,7 @@ test('a grid needing two page-columns produces two grid pages with no legend/ins
     options: { orientation: 'portrait', paperSize: 'A4', marginValue: 10, marginUnit: 'mm', instructionsPosition: 'none', includeLegend: false },
     outputPath,
   });
-  expect(countPdfPages(outputPath)).toBe(2);
+  expect(countPdfPages(outputPath)).toBe(3);
   fs.unlinkSync(outputPath);
 });
 
@@ -54,7 +54,7 @@ test('legend appears after grid and before after-positioned instructions', async
     options: { orientation: 'portrait', paperSize: 'A4', marginValue: 10, marginUnit: 'mm', instructionsPosition: 'after', includeLegend: true },
     outputPath,
   });
-  expect(countPdfPages(outputPath)).toBe(3);
+  expect(countPdfPages(outputPath)).toBe(4);
   fs.unlinkSync(outputPath);
 });
 
@@ -66,6 +66,18 @@ test('legend appears after grid even with before-positioned instructions', async
     options: { orientation: 'portrait', paperSize: 'A4', marginValue: 10, marginUnit: 'mm', instructionsPosition: 'before', includeLegend: true },
     outputPath,
   });
-  expect(countPdfPages(outputPath)).toBe(3);
+  expect(countPdfPages(outputPath)).toBe(4);
+  fs.unlinkSync(outputPath);
+});
+
+test('the cover page shows the project name and color count', async () => {
+  const outputPath = path.join(os.tmpdir(), `pdf-test-${Date.now()}-cover.pdf`);
+  await buildPdf({
+    chart: makeChart(5, 5),
+    instructions: [],
+    options: { orientation: 'portrait', paperSize: 'A4', marginValue: 10, marginUnit: 'mm', instructionsPosition: 'none', includeLegend: false, name: 'Mon Motif' },
+    outputPath,
+  });
+  expect(countPdfPages(outputPath)).toBe(2);
   fs.unlinkSync(outputPath);
 });

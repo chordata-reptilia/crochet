@@ -461,7 +461,7 @@ function readPdfExportOptions() {
     payload: {
       chart,
       instructions,
-      options: { orientation, paperSize, marginValue, marginUnit, instructionsPosition, includeLegend, theme: document.documentElement.dataset.theme },
+      options: { orientation, paperSize, marginValue, marginUnit, instructionsPosition, includeLegend, theme: document.documentElement.dataset.theme, name: AppState.name },
     },
   };
 }
