@@ -42,9 +42,8 @@ function buildPdf({ chart, instructions, options, outputPath }) {
     const stream = fs.createWriteStream(outputPath);
     doc.pipe(stream);
 
-    // Corner marks — a small mitered bracket at each page corner, adapted from
-    // the "planche imprimée" (specimen plate) reference layout: every page
-    // reads as one consistent framed object, not a plain printout.
+    // Corner marks — a small mitered bracket at each page corner, so every
+    // page reads as one consistent framed object, not a plain printout.
     function drawCornerMarks() {
       const inset = 14;
       const size = 12;
@@ -66,8 +65,33 @@ function buildPdf({ chart, instructions, options, outputPath }) {
       drawCornerMarks();
     }
 
-    // Cartouche — a small bordered specimen-label card, adapted from the same
-    // reference: key/value rows instead of a plain sentence.
+    // Frame around a content rectangle, styled per theme's frameStyle.
+    function drawThemedFrame(x, y, w, h) {
+      doc.save();
+      if (pdfTheme.frameStyle === 'triple-dashed') {
+        pdfTheme.roundColors.forEach((color, i) => {
+          const off = i * 3;
+          doc
+            .dash(3, { space: 2 })
+            .lineWidth(1)
+            .strokeColor(color)
+            .rect(x - off, y - off, w + off * 2, h + off * 2)
+            .stroke()
+            .undash();
+        });
+      } else if (pdfTheme.frameStyle === 'gradient') {
+        const gradient = doc.linearGradient(x, y, x + w, y + h);
+        gradient.stop(0, pdfTheme.accent).stop(1, pdfTheme.accent2 || pdfTheme.accent);
+        doc.lineWidth(1.6).rect(x, y, w, h).stroke(gradient);
+      } else {
+        // 'solid' and 'ink' — a single clean stroke in the accent color.
+        doc.lineWidth(pdfTheme.frameStyle === 'ink' ? 1.6 : 1.2).strokeColor(pdfTheme.accent).rect(x, y, w, h).stroke();
+      }
+      doc.restore();
+    }
+
+    // Cartouche — a small bordered specimen-label card: key/value rows
+    // instead of a plain sentence.
     function drawCartouche(rows) {
       const cartoucheWidth = 220;
       const rowHeight = 16;
@@ -89,20 +113,72 @@ function buildPdf({ chart, instructions, options, outputPath }) {
       doc.y = y + cartoucheHeight;
     }
 
+    // Washi — a small stacked vertical label (fixed decorative motif, not the
+    // user's own project name, since stacking Latin letters vertically reads
+    // poorly) placed beside the title.
+    function drawVerticalLabel(text, x, yStart) {
+      let y = yStart;
+      Array.from(text).forEach((ch) => {
+        doc.font(pdfTheme.headingFont).fillColor(pdfTheme.accent).fontSize(16).text(ch, x, y, { width: 24, align: 'center', lineBreak: false });
+        y += 20;
+      });
+    }
+
+    // Washi — a small hanko-style seal (a filled square with a single
+    // character reversed out in the page background color).
+    function drawHanko(x, y) {
+      const size = 22;
+      doc.rect(x, y, size, size).fill(pdfTheme.accent);
+      doc.font(pdfTheme.headingFont).fillColor(pdfTheme.pageBg).fontSize(13)
+        .text(pdfTheme.hankoChar, x, y + 5, { width: size, align: 'center', lineBreak: false });
+    }
+
     function drawCoverPage() {
       ensureFreshPage();
       const title = options.name && options.name.trim() !== '' ? options.name.trim() : 'Motif crochet';
       const usedColors = buildLegendRows(chart);
 
-      doc.font(pdfTheme.headingFont).fillColor(pdfTheme.accent).fontSize(28).text(title, { align: 'center' });
-      doc.moveDown(0.4);
-      const ruleWidth = 60;
-      doc.moveTo((layout.pageWidthPt - ruleWidth) / 2, doc.y)
-        .lineTo((layout.pageWidthPt + ruleWidth) / 2, doc.y)
-        .lineWidth(1.4)
-        .strokeColor(pdfTheme.accent)
-        .stroke();
-      doc.moveDown(1.2);
+      if (pdfTheme.bannerCover) {
+        const bannerHeight = 90;
+        doc.rect(0, 0, layout.pageWidthPt, bannerHeight).fill(pdfTheme.text);
+        doc.font(pdfTheme.headingFont).fillColor(pdfTheme.accent).fontSize(26).text(title.toUpperCase(), 0, 34, {
+          width: layout.pageWidthPt,
+          align: 'center',
+          characterSpacing: 1,
+        });
+        doc.font(pdfTheme.bodyFont).fillColor(pdfTheme.accent2 || pdfTheme.accent).fontSize(9)
+          .text('MOTIF DE CROCHET', 0, bannerHeight - 22, { width: layout.pageWidthPt, align: 'center', characterSpacing: 2 });
+        doc.y = bannerHeight + 40;
+      } else {
+        doc.font(pdfTheme.headingFont).fillColor(pdfTheme.accent).fontSize(28).text(title, { align: 'center' });
+        doc.moveDown(0.4);
+
+        if (pdfTheme.verticalTitle) {
+          drawVerticalLabel('編み図', layout.pageWidthPt - layout.marginPt - 26, doc.y + 10);
+        }
+
+        if (pdfTheme.frameStyle === 'triple-dashed') {
+          const ruleWidth = 70;
+          pdfTheme.roundColors.forEach((color, i) => {
+            doc.moveTo((layout.pageWidthPt - ruleWidth) / 2, doc.y + i * 4)
+              .lineTo((layout.pageWidthPt + ruleWidth) / 2, doc.y + i * 4)
+              .dash(3, { space: 2 })
+              .lineWidth(1.2)
+              .strokeColor(color)
+              .stroke()
+              .undash();
+          });
+          doc.moveDown(1.4);
+        } else {
+          const ruleWidth = 60;
+          doc.moveTo((layout.pageWidthPt - ruleWidth) / 2, doc.y)
+            .lineTo((layout.pageWidthPt + ruleWidth) / 2, doc.y)
+            .lineWidth(1.4)
+            .strokeColor(pdfTheme.accent)
+            .stroke();
+          doc.moveDown(1.2);
+        }
+      }
 
       const modeLabel = options.mode === 'c2c' ? 'Corner-to-Corner' : 'Grille classique';
       drawCartouche([
@@ -120,8 +196,17 @@ function buildPdf({ chart, instructions, options, outputPath }) {
         const startX = (layout.pageWidthPt - totalWidth) / 2;
         const y = doc.y;
         usedColors.slice(0, maxSwatches).forEach((row, i) => {
-          doc.rect(startX + i * (swatchSize + gap), y, swatchSize, swatchSize).fillAndStroke(row.hex, pdfTheme.gridLine);
+          const swatchX = startX + i * (swatchSize + gap);
+          if (pdfTheme.cellRadius > 0) {
+            doc.roundedRect(swatchX, y, swatchSize, swatchSize, pdfTheme.cellRadius).fillAndStroke(row.hex, pdfTheme.gridLine);
+          } else {
+            doc.rect(swatchX, y, swatchSize, swatchSize).fillAndStroke(row.hex, pdfTheme.gridLine);
+          }
         });
+      }
+
+      if (pdfTheme.showHanko) {
+        drawHanko(layout.pageWidthPt - layout.marginPt - 22, layout.pageHeightPt - layout.marginPt - 22);
       }
     }
 
@@ -155,28 +240,49 @@ function buildPdf({ chart, instructions, options, outputPath }) {
         for (let y = startY; y < endY; y++) {
           for (let x = startX; x < endX; x++) {
             const hex = cellColorHex(chart, chart.cells[y][x]);
-            doc
-              .rect(
-                layout.marginPt + (x - startX) * layout.cellPt,
-                layout.marginPt + (y - startY) * layout.cellPt,
-                layout.cellPt,
-                layout.cellPt
-              )
-              .fillAndStroke(hex, pdfTheme.gridLine);
+            const cellX = layout.marginPt + (x - startX) * layout.cellPt;
+            const cellY = layout.marginPt + (y - startY) * layout.cellPt;
+            if (pdfTheme.cellRadius > 0) {
+              doc.roundedRect(cellX, cellY, layout.cellPt, layout.cellPt, pdfTheme.cellRadius).fillAndStroke(hex, pdfTheme.gridLine);
+            } else {
+              doc.rect(cellX, cellY, layout.cellPt, layout.cellPt).fillAndStroke(hex, pdfTheme.gridLine);
+            }
           }
         }
 
         // Frame the drawn cells like a specimen plate, echoing the corner marks.
-        doc
-          .rect(
-            layout.marginPt - 2,
-            layout.marginPt - 2,
-            (endX - startX) * layout.cellPt + 4,
-            (endY - startY) * layout.cellPt + 4
-          )
-          .lineWidth(1.2)
-          .strokeColor(pdfTheme.accent)
-          .stroke();
+        drawThemedFrame(
+          layout.marginPt - 2,
+          layout.marginPt - 2,
+          (endX - startX) * layout.cellPt + 4,
+          (endY - startY) * layout.cellPt + 4
+        );
+
+        if (pdfTheme.showRowColNumbers) {
+          doc.font(pdfTheme.bodyFont).fontSize(6).fillColor(pdfTheme.gridLine);
+          for (let x = startX; x < endX; x++) {
+            doc.text(String(x + 1), layout.marginPt + (x - startX) * layout.cellPt, layout.marginPt - 11, {
+              width: layout.cellPt,
+              align: 'center',
+              lineBreak: false,
+            });
+          }
+          for (let y = startY; y < endY; y++) {
+            doc.text(String(y + 1), 2, layout.marginPt + (y - startY) * layout.cellPt + layout.cellPt / 2 - 3, {
+              width: layout.marginPt - 4,
+              align: 'right',
+              lineBreak: false,
+            });
+          }
+        }
+
+        if (pdfTheme.showMarginGuide) {
+          doc.save().dash(2, { space: 2 }).lineWidth(0.6).strokeColor(pdfTheme.gridLine)
+            .rect(6, 6, layout.pageWidthPt - 12, layout.pageHeightPt - 12)
+            .stroke()
+            .undash()
+            .restore();
+        }
 
         if (totalGridPages > 1) {
           doc

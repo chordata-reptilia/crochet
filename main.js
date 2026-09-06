@@ -14,7 +14,6 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      plugins: true,
     },
   });
 
@@ -127,6 +126,18 @@ ipcMain.handle('export:pdf-preview', async (_event, { chart, instructions, optio
   try {
     await buildPdf({ chart, instructions, options, outputPath: previewPath });
     return { success: true, path: previewPath };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+// Reads back a file the renderer already asked us to export/preview (the
+// native in-app PDF reader needs the raw bytes, not just the path, since it
+// renders pages itself via pdfjs-dist instead of embedding a browser viewer).
+ipcMain.handle('fs:read-pdf-bytes', async (_event, filePath) => {
+  try {
+    const buffer = await fs.readFile(filePath);
+    return { success: true, data: buffer.toString('base64') };
   } catch (err) {
     return { success: false, error: err.message };
   }

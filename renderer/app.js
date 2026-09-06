@@ -482,16 +482,27 @@ document.getElementById('pdf-export-confirm').addEventListener('click', async ()
   }
 });
 
+const pdfReader = createPdfReader({
+  canvas: document.getElementById('pdf-preview-canvas'),
+  pageLabelEl: document.getElementById('pdf-preview-page-label'),
+  thumbRailEl: document.getElementById('pdf-thumb-rail'),
+  prevBtn: document.getElementById('pdf-preview-prev-btn'),
+  nextBtn: document.getElementById('pdf-preview-next-btn'),
+  zoomInBtn: document.getElementById('pdf-preview-zoom-in-btn'),
+  zoomOutBtn: document.getElementById('pdf-preview-zoom-out-btn'),
+  fitBtn: document.getElementById('pdf-preview-fit-btn'),
+  fullscreenBtn: document.getElementById('pdf-preview-fullscreen-btn'),
+  fullscreenTarget: document.getElementById('pdf-canvas-viewport'),
+});
+
 let pdfPreviewRequestId = 0;
 
 async function refreshPdfPreview() {
   const requestId = ++pdfPreviewRequestId;
   const previewError = document.getElementById('pdf-preview-error');
-  const previewFrame = document.getElementById('pdf-preview-frame');
   const { payload, error } = readPdfExportOptions();
 
   if (error) {
-    previewFrame.src = '';
     previewError.textContent = error;
     previewError.hidden = false;
     return;
@@ -501,21 +512,20 @@ async function refreshPdfPreview() {
   if (requestId !== pdfPreviewRequestId) return; // a newer change superseded this request
 
   if (result.success) {
-    previewError.hidden = true;
-    previewFrame.src = `file://${result.path}?t=${Date.now()}`;
+    try {
+      await pdfReader.load(result.path);
+      if (requestId !== pdfPreviewRequestId) return;
+      previewError.hidden = true;
+    } catch (err) {
+      if (requestId !== pdfPreviewRequestId) return;
+      previewError.textContent = `Aperçu indisponible : ${err.message}`;
+      previewError.hidden = false;
+    }
   } else {
-    previewFrame.src = '';
     previewError.textContent = `Aperçu indisponible : ${result.error}`;
     previewError.hidden = false;
   }
 }
-
-document.getElementById('pdf-preview-fullscreen-btn').addEventListener('click', () => {
-  const previewFrame = document.getElementById('pdf-preview-frame');
-  if (previewFrame.requestFullscreen) {
-    previewFrame.requestFullscreen();
-  }
-});
 
 let pdfPreviewDebounceTimer = null;
 function schedulePdfPreviewRefresh() {

@@ -164,10 +164,23 @@
         </div>
         <div class="pdf-export-modal-preview">
           <div class="pdf-preview-toolbar">
+            <button type="button" id="pdf-preview-prev-btn" title="Page précédente">◀</button>
+            <span id="pdf-preview-page-label">Page 1 / 1</span>
+            <button type="button" id="pdf-preview-next-btn" title="Page suivante">▶</button>
+            <span class="toolbar-sep"></span>
+            <button type="button" id="pdf-preview-zoom-out-btn" title="Zoom -">−</button>
+            <button type="button" id="pdf-preview-fit-btn" title="Ajuster à la largeur">Ajuster</button>
+            <button type="button" id="pdf-preview-zoom-in-btn" title="Zoom +">+</button>
+            <span class="toolbar-sep"></span>
             <button type="button" id="pdf-preview-fullscreen-btn">Plein écran</button>
           </div>
           <div id="pdf-preview-error" class="pdf-preview-error" hidden></div>
-          <iframe id="pdf-preview-frame" title="Aperçu du PDF" allowfullscreen></iframe>
+          <div id="pdf-reader">
+            <div id="pdf-thumb-rail"></div>
+            <div id="pdf-canvas-viewport">
+              <canvas id="pdf-preview-canvas"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -199,6 +212,7 @@
   <script src="../src/instructions.js"></script>
   <script src="../src/legend.js"></script>
   <script src="color-picker.js"></script>
+  <script src="pdf-reader.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

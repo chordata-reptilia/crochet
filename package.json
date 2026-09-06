@@ -12,7 +12,13 @@
     "appId": "com.crochetpatterndesigner.app",
     "productName": "Crochet Pattern Designer",
     "asar": true,
-    "files": ["main.js", "preload.js", "renderer/**/*", "src/**/*", "package.json"],
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "src/**/*",
+      "package.json"
+    ],
     "win": {
       "target": "nsis"
     }
@@ -23,6 +29,7 @@
     "jest": "^30.5.1"
   },
   "dependencies": {
+    "pdfjs-dist": "^4.10.38",
     "pdfkit": "^0.20.2"
   }
 }

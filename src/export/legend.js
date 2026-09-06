@@ -33,7 +33,20 @@ function drawLegendSection(doc, rows, pageCtx) {
       writeHeading('Légende (suite)');
     }
     const rowTop = doc.y;
-    doc.rect(marginPt, rowTop, SWATCH_SIZE_PT, SWATCH_SIZE_PT).fillAndStroke(row.hex, pdfTheme.gridLine);
+
+    if (pdfTheme.legendStyle === 'card') {
+      doc.roundedRect(marginPt, rowTop - 2, pageWidthPt - marginPt * 2, ROW_HEIGHT_PT - 2, 3).stroke(pdfTheme.gridLine);
+    }
+
+    if (pdfTheme.legendStyle === 'pelote') {
+      const r = SWATCH_SIZE_PT / 2;
+      doc.circle(marginPt + r, rowTop + r, r).fillAndStroke(row.hex, pdfTheme.gridLine);
+    } else if (pdfTheme.cellRadius > 0) {
+      doc.roundedRect(marginPt, rowTop, SWATCH_SIZE_PT, SWATCH_SIZE_PT, pdfTheme.cellRadius).fillAndStroke(row.hex, pdfTheme.gridLine);
+    } else {
+      doc.rect(marginPt, rowTop, SWATCH_SIZE_PT, SWATCH_SIZE_PT).fillAndStroke(row.hex, pdfTheme.gridLine);
+    }
+
     doc.fillColor(pdfTheme.text).text(row.label, labelX, rowTop + 2, {
       width: labelWidth,
       height: SWATCH_SIZE_PT,
